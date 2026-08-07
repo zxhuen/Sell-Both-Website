@@ -1,0 +1,4 @@
+const SUPABASE_URL = "https://xolodghudewagudmyxos.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbG9kZ2h1ZGV3YWd1ZG15eG9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3NDU1NjYsImV4cCI6MjEwMTMyMTU2Nn0.Bzhnute26nCxgrxfQXKSdL1mF38BmoNCeyUwl58Gx3E";
+
+export const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

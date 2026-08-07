@@ -1,0 +1,267 @@
+import { supabaseClient } from "./supabase.js";
+
+const API_BASE = window.API_ENDPOINT || "http://localhost:8000";
+
+export async function authFetch(url, options = {}) {
+    const {
+        data: { session },
+    } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html";
+        return null;
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        credentials: options.credentials !== undefined && options.credentials !== null ?
+            options.credentials : "include",
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${session.access_token}`,
+        },
+    });
+
+    if (response.status === 401) {
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html";
+        return null;
+    }
+
+    return response;
+}
+
+export async function publicFetch(url, options = {}) {
+    const {
+        data: { session },
+    } = await supabaseClient.auth.getSession();
+
+    const headers = {
+        ...options.headers,
+    };
+
+    if (session) {
+        headers.Authorization = `Bearer ${session.access_token}`;
+    }
+
+    return fetch(url, {
+        ...options,
+        credentials: options.credentials !== undefined && options.credentials !== null ?
+            options.credentials : "include",
+        headers,
+    });
+}
+
+export async function addProduct(product) {
+    const response = await authFetch(`${API_BASE}/Products/add-product`, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to create product"
+        );
+    }
+
+    return response.json();
+}
+
+export async function deleteProduct(productId) {
+    if (!productId) {
+        throw new Error("Product id is required");
+    }
+
+    const response = await authFetch(`${API_BASE}/Products/delete-product?id=${encodeURIComponent(productId)}`, {
+        method: "DELETE",
+        mode: "cors",
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to delete product"
+        );
+    }
+
+    return response.json();
+}
+
+export async function getProductByPublicId(publicId) {
+    if (!publicId) {
+        throw new Error("Public id is required");
+    }
+
+    const response = await publicFetch(`${API_BASE}/Products/get-product-public-id?public_id=${encodeURIComponent(publicId)}`, {
+        method: "GET",
+        mode: "cors",
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to load product details"
+        );
+    }
+
+    return response.json();
+}
+
+export async function loadChatMessages(publicId) {
+    if (!publicId) {
+        throw new Error("Public id is required");
+    }
+
+    const response = await publicFetch(`${API_BASE}/Chat/Load-Chat?public_id=${encodeURIComponent(publicId)}`, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to load chat history"
+        );
+    }
+
+    const messages = await response.json();
+
+    if (!Array.isArray(messages)) {
+        return [];
+    }
+
+    return messages
+        .filter((message) => message && typeof message.content === "string")
+        .map((message) => ({
+            id: message.id,
+            role: message.role,
+            content: message.content,
+        }));
+}
+
+export function renderProductCard(product, elements) {
+    const title = (product && product.title) || "Untitled product";
+    const description =
+        (product && product.description) || "No description provided.";
+    const price = Number((product && product.price) || 0);
+
+    if (elements && elements.title) {
+        elements.title.textContent = title;
+    }
+
+    if (elements && elements.price) {
+        elements.price.textContent = `₱${price.toFixed(2)}`;
+    }
+
+    if (elements && elements.description) {
+        elements.description.textContent = description;
+    }
+}
+
+export function renderNotFound(elements) {
+    if (elements && elements.title) {
+        elements.title.textContent = "Product not found";
+    }
+
+    if (elements && elements.price) {
+        elements.price.textContent = "$0.00";
+    }
+
+    if (elements && elements.description) {
+        elements.description.textContent =
+            "The requested product could not be loaded.";
+    }
+}
+
+function createProductCard(product) {
+    const card = document.createElement("div");
+    card.classList.add("product-card");
+    card.dataset.productId = product.id || "";
+    card.dataset.publicId = product.public_id || "";
+
+    card.innerHTML = `
+        <div class="product-content">
+          <h2>${product.title}</h2>
+          <p>${product.description || "No description provided."}</p>
+          <p class="product-public-id">Public ID: ${product.public_id || "N/A"}</p>
+        </div>
+        <div class="product-meta">
+          <span class="price">$${parseFloat(product.price).toFixed(2)}</span>
+          <div class="actions">
+            <button class="secondary-btn">Open</button>
+            <button class="danger-btn">Delete</button>
+          </div>
+        </div>
+    `;
+
+    return card;
+}
+
+export async function loadProducts(productGrid, listStatusText) {
+    if (!listStatusText) return;
+
+    listStatusText.textContent = "Loading products...";
+    productGrid.innerHTML = "";
+
+    try {
+        const response = await authFetch(`${API_BASE}/Products/list-product`, {
+            method: "GET",
+            mode: "cors",
+        });
+
+        const statusTextResponse = response ? response.statusText : undefined;
+
+        if (!response || !response.ok) {
+            const errorBody = response ? await response.json().catch(() => ({})) : {};
+            throw new Error(
+                errorBody.detail ||
+                errorBody.message ||
+                statusTextResponse ||
+                "Failed to load products"
+            );
+        }
+
+        const products = await response.json();
+
+        if (!Array.isArray(products) || products.length === 0) {
+            listStatusText.textContent = "No products found.";
+            return;
+        }
+
+        products.forEach((product) => {
+            productGrid.appendChild(createProductCard(product));
+        });
+
+        listStatusText.textContent = "";
+    } catch (error) {
+        console.error("Failed to load products:", error);
+        listStatusText.textContent = error.message || "Could not load products.";
+    }
+}
