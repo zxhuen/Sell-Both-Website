@@ -1,4 +1,4 @@
-import { getProductByPublicId, loadChatMessages, renderNotFound, renderProductCard } from "./apiClient.js";
+import { getProductByPublicId, loadChatMessages, renderNotFound, renderProductCard, sendLunaMessage } from "./apiClient.js";
 
 const params = new URLSearchParams(window.location.search);
 const publicId = params.get("public_id") || params.get("id");
@@ -8,7 +8,31 @@ const elements = {
     price: document.getElementById("productPrice"),
     description: document.getElementById("productDescription"),
     chatMessages: document.getElementById("chatMessages"),
+    chatForm: document.getElementById("chatForm"),
+    chatInput: document.getElementById("chatInput"),
 };
+
+function createMessageElement(role, text) {
+    const messageWrapper = document.createElement("div");
+    messageWrapper.className = role === "user" ? "message user-message" : "message assistant-message";
+
+    if (role !== "user") {
+        const avatar = document.createElement("div");
+        avatar.className = "message-avatar";
+        const avatarImage = document.createElement("img");
+        avatarImage.src = "images/marin.png";
+        avatarImage.alt = "Marin assistant";
+        avatar.appendChild(avatarImage);
+        messageWrapper.appendChild(avatar);
+    }
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+    content.textContent = text || "";
+    messageWrapper.appendChild(content);
+
+    return messageWrapper;
+}
 
 function renderChatMessages(messages, container) {
     if (!container) return;
@@ -16,37 +40,48 @@ function renderChatMessages(messages, container) {
     container.innerHTML = "";
 
     if (!Array.isArray(messages) || messages.length === 0) {
-        const emptyState = document.createElement("div");
-        emptyState.className = "message assistant-message";
-        emptyState.innerHTML = `
-            <div class="message-avatar">AI</div>
-            <div class="message-content">No chat history yet for this product.</div>
-        `;
+        const emptyState = createMessageElement("assistant", "No chat history yet for this product.");
         container.appendChild(emptyState);
         return;
     }
 
     messages.forEach((message) => {
-        const messageWrapper = document.createElement("div");
-        messageWrapper.className = message.role === "user" ? "message user-message" : "message assistant-message";
-
-        if (message.role !== "user") {
-            const avatar = document.createElement("div");
-            avatar.className = "message-avatar";
-            const avatarImage = document.createElement("img");
-            avatarImage.src = "images/marin.png";
-            avatarImage.alt = "Marin assistant";
-            avatar.appendChild(avatarImage);
-            messageWrapper.appendChild(avatar);
-        }
-
-        const content = document.createElement("div");
-        content.className = "message-content";
-        content.textContent = message.content || "";
-        messageWrapper.appendChild(content);
-
-        container.appendChild(messageWrapper);
+        container.appendChild(createMessageElement(message.role, message.content || ""));
     });
+}
+
+function appendChatMessage(role, text) {
+    if (!elements.chatMessages) return;
+    elements.chatMessages.appendChild(createMessageElement(role, text));
+    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+}
+
+async function handleChatSubmit(event) {
+    event.preventDefault();
+
+    if (!elements.chatInput || !elements.chatMessages) {
+        return;
+    }
+
+    const message = elements.chatInput.value.trim();
+    if (!message) {
+        return;
+    }
+
+    elements.chatInput.value = "";
+    appendChatMessage("user", message);
+
+    const loadingMessage = createMessageElement("assistant", "Typing...");
+    elements.chatMessages.appendChild(loadingMessage);
+    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+
+    try {
+        const assistantText = await sendLunaMessage(message, publicId);
+        loadingMessage.querySelector(".message-content").textContent = assistantText || "No response received.";
+    } catch (err) {
+        console.error("Failed to send chat message:", err);
+        loadingMessage.querySelector(".message-content").textContent = "Unable to get a response. Please try again.";
+    }
 }
 
 async function fetchProductDetails() {
@@ -79,6 +114,10 @@ async function fetchChatHistory() {
 }
 
 async function initializePage() {
+    if (elements.chatForm) {
+        elements.chatForm.addEventListener("submit", handleChatSubmit);
+    }
+
     await fetchProductDetails();
     await fetchChatHistory();
 }

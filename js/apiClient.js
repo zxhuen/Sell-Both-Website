@@ -159,11 +159,69 @@ export async function loadChatMessages(publicId) {
 
     return messages
         .filter((message) => message && typeof message.content === "string")
-        .map((message) => ({
-            id: message.id,
-            role: message.role,
-            content: message.content,
-        }));
+        .map((message) => {
+            const normalizedRole =
+                typeof message.role === "string" && message.role.toLowerCase() === "user" ?
+                "user" :
+                "assistant";
+
+            return {
+                id: message.id,
+                role: normalizedRole,
+                content: message.content,
+            };
+        });
+}
+
+export async function sendLunaMessage(message, publicId) {
+    if (!message || typeof message !== "string") {
+        throw new Error("Chat message is required");
+    }
+
+    if (!publicId || typeof publicId !== "string") {
+        throw new Error("Public id is required for chat");
+    }
+
+    const response = await publicFetch(`${API_BASE}/Chat/Luna?public_id=${encodeURIComponent(publicId)}`, {
+        method: "POST",
+        mode: "cors",
+        credentials: "include", // Ensures cookies are attached
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to send chat message"
+        );
+    }
+
+    const text = await response.text();
+
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        try {
+            const jsonBody = JSON.parse(text);
+            if (typeof jsonBody === "string") {
+                return jsonBody;
+            }
+            if (jsonBody && typeof jsonBody.message === "string") {
+                return jsonBody.message;
+            }
+        } catch {
+            // Fall through to returning raw text if JSON parse fails
+        }
+    }
+
+    return text;
 }
 
 export function renderProductCard(product, elements) {
