@@ -61,20 +61,27 @@ searchInput.addEventListener("input", (e) => {
         const title = card.querySelector("h2").textContent.toLowerCase();
         const categoryEl = card.querySelector(".category");
         const category = categoryEl ? categoryEl.textContent.toLowerCase() : "";
-        const description = card.querySelector("p").textContent.toLowerCase();
+        const descEl = card.querySelector(".product-card-description") || card.querySelector("p");
+        const description = descEl ? descEl.textContent.toLowerCase() : "";
 
         const matches =
             title.includes(query) ||
             category.includes(query) ||
             description.includes(query);
 
-        card.style.display = matches ? "flex" : "none";
+        // Preserve original card layout (grid) by clearing the display
+        // when visible; set to 'none' when not matching.
+        card.style.display = matches ? "" : "none";
     });
 });
 
 // ==========================================================================
 // CREATE NEW PRODUCT
 // ==========================================================================
+const CREATE_COOLDOWN_MS = 5000; // 5 seconds cooldown after creating a product
+let lastCreateTime = 0;
+let createCooldownInterval = null;
+
 productForm.addEventListener("submit", async(e) => {
     e.preventDefault();
 
@@ -83,6 +90,13 @@ productForm.addEventListener("submit", async(e) => {
     const description = descriptionInput.value.trim();
 
     if (!title || Number.isNaN(price)) {
+        return;
+    }
+
+    const now = Date.now();
+    if (now - lastCreateTime < CREATE_COOLDOWN_MS) {
+        const wait = Math.ceil((CREATE_COOLDOWN_MS - (now - lastCreateTime)) / 1000);
+        statusText.textContent = `Please wait ${wait}s before creating another product.`;
         return;
     }
 
@@ -119,12 +133,32 @@ productForm.addEventListener("submit", async(e) => {
         productGrid.prepend(newCard);
         closeModal();
         productForm.reset();
+        // start cooldown
+        lastCreateTime = Date.now();
+        let remaining = Math.ceil(CREATE_COOLDOWN_MS / 1000);
+        submitButton.disabled = true;
+        statusText.textContent = `Please wait ${remaining}s before creating another product.`;
+        if (createCooldownInterval) clearInterval(createCooldownInterval);
+        createCooldownInterval = setInterval(() => {
+            remaining -= 1;
+            if (remaining > 0) {
+                statusText.textContent = `Please wait ${remaining}s before creating another product.`;
+            } else {
+                clearInterval(createCooldownInterval);
+                createCooldownInterval = null;
+                submitButton.disabled = false;
+                statusText.textContent = "";
+            }
+        }, 1000);
     } catch (error) {
         console.error("Failed to create product:", error);
         alert(error.message || "Unable to create product. Please try again.");
     } finally {
-        submitButton.disabled = false;
-        statusText.textContent = "";
+        // only re-enable immediately if there is no active cooldown
+        if (!createCooldownInterval) {
+            submitButton.disabled = false;
+            statusText.textContent = "";
+        }
     }
 });
 

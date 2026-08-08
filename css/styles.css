@@ -242,6 +242,21 @@ body {
     color: var(--text-tertiary) !important;
 }
 
+
+/* Product card expanded description */
+
+.product-card-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-top: 0.5rem;
+}
+
+.product-card.expanded {
+    /* optional visual change when expanded */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
 .product-meta {
     display: flex;
     align-items: center;

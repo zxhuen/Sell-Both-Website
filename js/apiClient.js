@@ -45,13 +45,26 @@ export async function publicFetch(url, options = {}) {
         headers.Authorization = `Bearer ${session.access_token}`;
     }
 
-    return fetch(url, {
+    const response = await fetch(url, {
         ...options,
         credentials: options.credentials !== undefined && options.credentials !== null ?
             options.credentials : "include",
         headers,
     });
+
+    if (response.status === 401) {
+        try {
+            await supabaseClient.auth.signOut();
+        } catch (err) {
+            // ignore sign out errors
+        }
+        window.location.href = "login.html";
+        return null;
+    }
+
+    return response;
 }
+
 
 export async function addProduct(product) {
     const response = await authFetch(`${API_BASE}/Products/add-product`, {
@@ -265,19 +278,76 @@ function createProductCard(product) {
     card.dataset.publicId = product.public_id || "";
 
     card.innerHTML = `
-        <div class="product-content">
-          <h2>${product.title}</h2>
-          <p>${product.description || "No description provided."}</p>
-          <p class="product-public-id">Public ID: ${product.public_id || "N/A"}</p>
-        </div>
-        <div class="product-meta">
-          <span class="price">$${parseFloat(product.price).toFixed(2)}</span>
-          <div class="actions">
-            <button class="secondary-btn">Open</button>
-            <button class="danger-btn">Delete</button>
-          </div>
-        </div>
-    `;
+                <div class="product-content">
+                    <h2>${product.title}</h2>
+                    <p class="product-public-id">Public ID: ${product.public_id || "N/A"}</p>
+                    <div class="product-card-description" style="display:none;">${product.description ? escapeHtml(product.description) : ""}</div>
+                </div>
+                <div class="product-meta">
+                    <span class="price">$${parseFloat(product.price).toFixed(2)}</span>
+                    <div class="actions">
+                        <button class="secondary-btn">Open</button>
+                        <button class="danger-btn">Delete</button>
+                        <button type="button" class="secondary-btn copy-link-btn">Copy Link</button>
+                    </div>
+                </div>
+        `;
+
+    // Helper to escape HTML in inserted text
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Attach clipboard copy handler for the public product URL
+    const copyBtn = card.querySelector(".copy-link-btn");
+    if (copyBtn) {
+        copyBtn.addEventListener("click", async(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const pubId = product.public_id || product.publicId || product.publicId;
+            if (!pubId) return;
+
+            const link = `${window.location.origin}/product.html?public_id=${encodeURIComponent(pubId)}`;
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(link);
+                } else {
+                    const ta = document.createElement("textarea");
+                    ta.value = link;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(ta);
+                }
+
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = "Copied!";
+                setTimeout(() => (copyBtn.textContent = originalText), 2000);
+            } catch (err) {
+                console.error("Failed to copy product link:", err);
+            }
+        });
+    }
+
+    // Toggle expanded state when clicking the card (ignore clicks on buttons/links)
+    card.addEventListener("click", (e) => {
+        if (e.target.closest('button') || e.target.closest('.actions')) return;
+        card.classList.toggle('expanded');
+        const desc = card.querySelector('.product-card-description');
+        if (desc) {
+            if (card.classList.contains('expanded')) {
+                desc.style.display = 'block';
+            } else {
+                desc.style.display = 'none';
+            }
+        }
+    });
 
     return card;
 }
