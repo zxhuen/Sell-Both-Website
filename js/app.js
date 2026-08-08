@@ -1,4 +1,4 @@
-import { addProduct, deleteProduct, loadProducts } from "./apiClient.js";
+import { addProduct, createProductCard, deleteProduct, loadProducts } from "./apiClient.js";
 
 // ==========================================================================
 // DOM ELEMENTS
@@ -110,25 +110,7 @@ productForm.addEventListener("submit", async(e) => {
             price,
         });
 
-        const newCard = document.createElement("div");
-        newCard.classList.add("product-card");
-        newCard.dataset.productId = createdProduct.id || "";
-        newCard.dataset.publicId = createdProduct.public_id || "";
-
-        newCard.innerHTML = `
-        <div class="product-content">
-          <h2>${createdProduct.title}</h2>
-          <p>${createdProduct.description || description || "No description provided."}</p>
-          <p class="product-public-id">Public ID: ${createdProduct.public_id || "N/A"}</p>
-        </div>
-        <div class="product-meta">
-          <span class="price">$${parseFloat(createdProduct.price).toFixed(2)}</span>
-          <div class="actions">
-            <button class="secondary-btn">Open</button>
-            <button class="danger-btn">Delete</button>
-          </div>
-        </div>
-      `;
+        const newCard = createProductCard({...createdProduct, title: createdProduct.title || title, description: createdProduct.description || description, price: createdProduct.price || price, });
 
         productGrid.prepend(newCard);
         closeModal();

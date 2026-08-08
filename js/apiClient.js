@@ -271,20 +271,35 @@ export function renderNotFound(elements) {
     }
 }
 
-function createProductCard(product) {
+export function createProductCard(product) {
     const card = document.createElement("div");
     card.classList.add("product-card");
     card.dataset.productId = product.id || "";
-    card.dataset.publicId = product.public_id || "";
+    card.dataset.publicId = product.public_id || product.publicId || "";
+
+
+
+    const safeTitle = escapeHtml((product && product.title) || "Untitled product");
+    const safeDescription = escapeHtml(
+        (product && product.description) || "No description provided."
+    );
+    const safePublicId = escapeHtml(
+        (product && (product.public_id || product.publicId)) || "N/A"
+    );
+    const safePrice = Number(product && product.price) || 0;
+
+
+
 
     card.innerHTML = `
                 <div class="product-content">
-                    <h2>${product.title}</h2>
-                    <p class="product-public-id">Public ID: ${product.public_id || "N/A"}</p>
-                    <div class="product-card-description" style="display:none;">${product.description ? escapeHtml(product.description) : ""}</div>
+                    <h2>${safeTitle}</h2>
+                    <p>${safeDescription}</p>
+                    <p class="product-public-id">Public ID: ${safePublicId}</p>
+                    <div class="product-card-description" style="display:none;">${safeDescription}</div>
                 </div>
                 <div class="product-meta">
-                    <span class="price">$${parseFloat(product.price).toFixed(2)}</span>
+                    <span class="price">$${safePrice.toFixed(2)}</span>
                     <div class="actions">
                         <button class="secondary-btn">Open</button>
                         <button class="danger-btn">Delete</button>
@@ -309,7 +324,7 @@ function createProductCard(product) {
         copyBtn.addEventListener("click", async(e) => {
             e.preventDefault();
             e.stopPropagation();
-            const pubId = product.public_id || product.publicId || product.publicId;
+            const pubId = product.public_id || product.publicId || "";
             if (!pubId) return;
 
             const link = `${window.location.origin}/product.html?public_id=${encodeURIComponent(pubId)}`;
