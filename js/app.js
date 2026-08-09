@@ -1,4 +1,4 @@
-import { addProduct, createProductCard, deleteProduct, loadProducts } from "./apiClient.js";
+import { addProduct, createProductCard, deleteProduct, loadProducts, markProductAsSold } from "./apiClient.js";
 
 // ==========================================================================
 // DOM ELEMENTS
@@ -147,11 +147,51 @@ productForm.addEventListener("submit", async(e) => {
 loadProducts(productGrid, listStatusText);
 
 // ==========================================================================
-// CARD ACTIONS (OPEN & DELETE)
+// CARD ACTIONS (OPEN / MARK AS SOLD / DELETE)
 // ==========================================================================
 productGrid.addEventListener("click", async(e) => {
-    const openButton = e.target.closest(".secondary-btn");
+    const markSoldButton = e.target.closest(".mark-as-sold-btn");
+    const openButton = e.target.closest(".open-btn");
     const deleteButton = e.target.closest(".danger-btn");
+
+    if (markSoldButton) {
+        const card = markSoldButton.closest(".product-card");
+        const productId = card && card.dataset.productId;
+        const currentStatus = card && card.dataset.productStatus;
+
+        if (!productId) {
+            alert("This product is missing its id, so it cannot be updated.");
+            return;
+        }
+
+        if (markSoldButton.disabled || currentStatus === "sold") {
+            return;
+        }
+
+        markSoldButton.disabled = true;
+        const originalText = markSoldButton.textContent;
+        markSoldButton.textContent = "Marking...";
+
+        try {
+            await markProductAsSold(productId);
+
+            const statusLabel = card.querySelector(".product-status-label");
+            if (statusLabel) {
+                statusLabel.textContent = "Sold";
+            }
+
+            card.dataset.productStatus = "sold";
+            markSoldButton.textContent = "Sold";
+            markSoldButton.disabled = true;
+        } catch (error) {
+            console.error("Failed to mark product as sold:", error);
+            alert(error.message || "Unable to mark product as sold. Please try again.");
+            markSoldButton.disabled = false;
+            markSoldButton.textContent = originalText;
+        }
+
+        return;
+    }
 
     if (openButton) {
         const card = openButton.closest(".product-card");

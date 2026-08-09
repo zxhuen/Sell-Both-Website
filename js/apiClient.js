@@ -116,6 +116,31 @@ export async function deleteProduct(productId) {
     return response.json();
 }
 
+export async function markProductAsSold(productId) {
+    if (!productId) {
+        throw new Error("Product id is required");
+    }
+
+    const response = await authFetch(`${API_BASE}/Products/mark-as-sold?id=${encodeURIComponent(productId)}`, {
+        method: "GET",
+        mode: "cors",
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to mark product as sold"
+        );
+    }
+
+    return response.json();
+}
+
 export async function getProductByPublicId(publicId) {
     if (!publicId) {
         throw new Error("Public id is required");
@@ -287,9 +312,11 @@ export function createProductCard(product) {
         (product && (product.public_id || product.publicId)) || "N/A"
     );
     const safePrice = Number(product && product.price) || 0;
+    const statusValue = String((product && product.status) || "available").toLowerCase();
+    const isSold = statusValue === "sold";
+    const statusLabel = isSold ? "Sold" : "Available";
 
-
-
+    card.dataset.productStatus = isSold ? "sold" : "available";
 
     card.innerHTML = `
                 <div class="product-content">
@@ -300,9 +327,11 @@ export function createProductCard(product) {
                 </div>
                 <div class="product-meta">
                     <span class="price">$${safePrice.toFixed(2)}</span>
+                    <span class="product-status-label">${statusLabel}</span>
                     <div class="actions">
-                        <button class="secondary-btn">Open</button>
-                        <button class="danger-btn">Delete</button>
+                        <button type="button" class="secondary-btn open-btn">Open</button>
+                        <button type="button" class="danger-btn">Delete</button>
+                        <button type="button" class="secondary-btn mark-as-sold-btn" ${isSold ? "disabled" : ""}>${isSold ? "Sold" : "Mark as Sold"}</button>
                         <button type="button" class="secondary-btn copy-link-btn">Copy Link</button>
                     </div>
                 </div>
