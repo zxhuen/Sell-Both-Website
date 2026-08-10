@@ -2,6 +2,17 @@ import { supabaseClient } from "./supabase.js";
 
 const API_BASE = window.API_ENDPOINT || "http://localhost:8000";
 
+// Helper function to escape HTML string input safely
+function escapeHtml(str) {
+    if (typeof str !== "string") return "";
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 export async function authFetch(url, options = {}) {
     const {
         data: { session },
@@ -64,7 +75,6 @@ export async function publicFetch(url, options = {}) {
 
     return response;
 }
-
 
 export async function addProduct(product) {
     const response = await authFetch(`${API_BASE}/Products/add-product`, {
@@ -135,6 +145,32 @@ export async function markProductAsSold(productId) {
             errorBody.message ||
             statusText ||
             "Failed to mark product as sold"
+        );
+    }
+
+    return response.json();
+}
+
+export async function getUserProfile() {
+    const response = await authFetch(`${API_BASE}/User/show-profile`, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!response) return null;
+
+    const statusText = response.statusText;
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to load user profile"
         );
     }
 
@@ -223,7 +259,7 @@ export async function sendLunaMessage(message, publicId) {
     const response = await publicFetch(`${API_BASE}/Chat/Luna?public_id=${encodeURIComponent(publicId)}`, {
         method: "POST",
         mode: "cors",
-        credentials: "include", // Ensures cookies are attached
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },
@@ -264,8 +300,7 @@ export async function sendLunaMessage(message, publicId) {
 
 export function renderProductCard(product, elements) {
     const title = (product && product.title) || "Untitled product";
-    const description =
-        (product && product.description) || "No description provided.";
+    const description = (product && product.description) || "No description provided.";
     const price = Number((product && product.price) || 0);
 
     if (elements && elements.title) {
@@ -287,12 +322,11 @@ export function renderNotFound(elements) {
     }
 
     if (elements && elements.price) {
-        elements.price.textContent = "$0.00";
+        elements.price.textContent = "₱0.00";
     }
 
     if (elements && elements.description) {
-        elements.description.textContent =
-            "The requested product could not be loaded.";
+        elements.description.textContent = "The requested product could not be loaded.";
     }
 }
 
@@ -302,15 +336,9 @@ export function createProductCard(product) {
     card.dataset.productId = product.id || "";
     card.dataset.publicId = product.public_id || product.publicId || "";
 
-
-
     const safeTitle = escapeHtml((product && product.title) || "Untitled product");
-    const safeDescription = escapeHtml(
-        (product && product.description) || "No description provided."
-    );
-    const safePublicId = escapeHtml(
-        (product && (product.public_id || product.publicId)) || "N/A"
-    );
+    const safeDescription = escapeHtml((product && product.description) || "No description provided.");
+    const safePublicId = escapeHtml((product && (product.public_id || product.publicId)) || "N/A");
     const safePrice = Number(product && product.price) || 0;
     const statusValue = String((product && product.status) || "available").toLowerCase();
     const isSold = statusValue === "sold";
@@ -319,35 +347,25 @@ export function createProductCard(product) {
     card.dataset.productStatus = isSold ? "sold" : "available";
 
     card.innerHTML = `
-                <div class="product-content">
-                    <h2>${safeTitle}</h2>
-                    <p>${safeDescription}</p>
-                    <p class="product-public-id">Public ID: ${safePublicId}</p>
-                    <div class="product-card-description" style="display:none;">${safeDescription}</div>
-                </div>
-                <div class="product-meta">
-                    <span class="price">$${safePrice.toFixed(2)}</span>
-                    <span class="product-status-label">${statusLabel}</span>
-                    <div class="actions">
-                        <button type="button" class="secondary-btn open-btn">Open</button>
-                        <button type="button" class="danger-btn">Delete</button>
-                        <button type="button" class="secondary-btn mark-as-sold-btn" ${isSold ? "disabled" : ""}>${isSold ? "Sold" : "Mark as Sold"}</button>
-                        <button type="button" class="secondary-btn copy-link-btn">Copy Link</button>
-                    </div>
-                </div>
-        `;
+        <div class="product-content">
+            <h2>${safeTitle}</h2>
+            <p>${safeDescription}</p>
+            <p class="product-public-id">Public ID: ${safePublicId}</p>
+            <div class="product-card-description" style="display:none;">${safeDescription}</div>
+        </div>
+        <div class="product-meta">
+            <span class="price">₱${safePrice.toFixed(2)}</span>
+            <span class="product-status-label">${statusLabel}</span>
+            <div class="actions">
+                <button type="button" class="secondary-btn open-btn">Open</button>
+                <button type="button" class="danger-btn">Delete</button>
+                <button type="button" class="secondary-btn mark-as-sold-btn" ${isSold ? "disabled" : ""}>${isSold ? "Sold" : "Mark as Sold"}</button>
+                <button type="button" class="secondary-btn copy-link-btn">Copy Link</button>
+            </div>
+        </div>
+    `;
 
-    // Helper to escape HTML in inserted text
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    // Attach clipboard copy handler for the public product URL
+    // Attach clipboard copy handler
     const copyBtn = card.querySelector(".copy-link-btn");
     if (copyBtn) {
         copyBtn.addEventListener("click", async(e) => {
@@ -379,17 +397,13 @@ export function createProductCard(product) {
         });
     }
 
-    // Toggle expanded state when clicking the card (ignore clicks on buttons/links)
+    // Toggle expanded state when clicking the card (ignore clicks on buttons/actions)
     card.addEventListener("click", (e) => {
-        if (e.target.closest('button') || e.target.closest('.actions')) return;
-        card.classList.toggle('expanded');
-        const desc = card.querySelector('.product-card-description');
+        if (e.target.closest("button") || e.target.closest(".actions")) return;
+        card.classList.toggle("expanded");
+        const desc = card.querySelector(".product-card-description");
         if (desc) {
-            if (card.classList.contains('expanded')) {
-                desc.style.display = 'block';
-            } else {
-                desc.style.display = 'none';
-            }
+            desc.style.display = card.classList.contains("expanded") ? "block" : "none";
         }
     });
 
@@ -408,10 +422,12 @@ export async function loadProducts(productGrid, listStatusText) {
             mode: "cors",
         });
 
-        const statusTextResponse = response ? response.statusText : undefined;
+        if (!response) return;
 
-        if (!response || !response.ok) {
-            const errorBody = response ? await response.json().catch(() => ({})) : {};
+        const statusTextResponse = response.statusText;
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => ({}));
             throw new Error(
                 errorBody.detail ||
                 errorBody.message ||
