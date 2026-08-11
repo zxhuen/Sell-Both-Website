@@ -60,6 +60,56 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        /* Navigation Bar */
+        
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .nav-brand {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background: var(--bg-secondary);
+            border-color: var(--glass-border-hover);
+        }
+        
+        .nav-link.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: transparent;
+        }
         /* Header Section */
         
         .header {
@@ -284,6 +334,15 @@
 </head>
 
 <body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="nav-bar" aria-label="Main navigation">
+        <div class="nav-brand">SellBot</div>
+        <div class="nav-links">
+            <a href="product.html" class="nav-link">Products</a>
+            <a href="profile.html" class="nav-link active">Profile</a>
+        </div>
+    </nav>
 
     <!-- HEADER SECTION -->
     <header class="header">
