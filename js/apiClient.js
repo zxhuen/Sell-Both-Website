@@ -202,6 +202,31 @@ export async function getProductByPublicId(publicId) {
     return response.json();
 }
 
+export async function getChatSessionCount(productId) {
+    if (!productId) {
+        throw new Error("Product id is required");
+    }
+
+    const response = await authFetch(`${API_BASE}/Analytics/get-chat-session-count?product_id=${encodeURIComponent(productId)}`, {
+        method: "POST",
+        mode: "cors",
+    });
+
+    const statusText = response ? response.statusText : undefined;
+
+    if (!response || !response.ok) {
+        const errorBody = response ? await response.json().catch(() => ({})) : {};
+        throw new Error(
+            errorBody.detail ||
+            errorBody.message ||
+            statusText ||
+            "Failed to load chat session count"
+        );
+    }
+
+    return response.json();
+}
+
 export async function loadChatMessages(publicId) {
     if (!publicId) {
         throw new Error("Public id is required");
@@ -357,6 +382,7 @@ export function createProductCard(product) {
             <span class="price">₱${safePrice.toFixed(2)}</span>
             <span class="product-status-label">${statusLabel}</span>
             <div class="actions">
+                <button type="button" class="secondary-btn view-count-btn">View Count</button>
                 <button type="button" class="secondary-btn open-btn">Open</button>
                 <button type="button" class="danger-btn">Delete</button>
                 <button type="button" class="secondary-btn mark-as-sold-btn" ${isSold ? "disabled" : ""}>${isSold ? "Sold" : "Mark as Sold"}</button>

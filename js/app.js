@@ -1,4 +1,4 @@
-import { addProduct, createProductCard, deleteProduct, loadProducts, markProductAsSold } from "./apiClient.js";
+import { addProduct, createProductCard, deleteProduct, getChatSessionCount, loadProducts, markProductAsSold } from "./apiClient.js";
 
 // ==========================================================================
 // DOM ELEMENTS
@@ -10,6 +10,10 @@ const productForm = document.querySelector(".product-form");
 const productGrid = document.querySelector(".product-grid");
 const searchInput = document.querySelector(".search-input");
 const listStatusText = document.getElementById("listStatusText");
+const analyticsModal = document.getElementById("analyticsModal");
+const closeAnalyticsModalBtn = document.getElementById("closeAnalyticsModalBtn");
+const analyticsModalProductId = document.getElementById("analyticsModalProductId");
+const analyticsModalContent = document.getElementById("analyticsModalContent");
 
 // Form Inputs
 const nameInput = productForm.querySelector('input[placeholder="Wireless Mouse"]');
@@ -33,8 +37,23 @@ function closeModal() {
     productForm.reset();
 }
 
+function openAnalyticsModal(productId) {
+    analyticsModalProductId.textContent = `Product ID: ${productId}`;
+    analyticsModalContent.textContent = "Loading chat session count...";
+    analyticsModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+}
+
+function closeAnalyticsModal() {
+    analyticsModal.classList.add("hidden");
+    if (productModal && productModal.classList.contains("hidden")) {
+        document.body.style.overflow = "";
+    }
+}
+
 openModalBtn.addEventListener("click", openModal);
 closeModalBtn.addEventListener("click", closeModal);
+closeAnalyticsModalBtn.addEventListener("click", closeAnalyticsModal);
 
 // Close modal when clicking on the backdrop
 productModal.addEventListener("click", (e) => {
@@ -45,8 +64,12 @@ productModal.addEventListener("click", (e) => {
 
 // Close modal on Escape key press
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !productModal.classList.contains("hidden")) {
-        closeModal();
+    if (e.key === "Escape") {
+        if (!productModal.classList.contains("hidden")) {
+            closeModal();
+        } else if (!analyticsModal.classList.contains("hidden")) {
+            closeAnalyticsModal();
+        }
     }
 });
 
@@ -144,15 +167,44 @@ productForm.addEventListener("submit", async(e) => {
     }
 });
 
+analyticsModal.addEventListener("click", (e) => {
+    if (e.target === analyticsModal) {
+        closeAnalyticsModal();
+    }
+});
+
 loadProducts(productGrid, listStatusText);
 
 // ==========================================================================
 // CARD ACTIONS (OPEN / MARK AS SOLD / DELETE)
 // ==========================================================================
 productGrid.addEventListener("click", async(e) => {
+    const viewCountButton = e.target.closest(".view-count-btn");
     const markSoldButton = e.target.closest(".mark-as-sold-btn");
     const openButton = e.target.closest(".open-btn");
     const deleteButton = e.target.closest(".danger-btn");
+
+    if (viewCountButton) {
+        const card = viewCountButton.closest(".product-card");
+        const productId = card && card.dataset.productId;
+
+        if (!productId) {
+            alert("This product is missing its id, so it cannot be checked.");
+            return;
+        }
+
+        openAnalyticsModal(productId);
+
+        try {
+            const payload = await getChatSessionCount(productId);
+            analyticsModalContent.textContent = JSON.stringify(payload, null, 2);
+        } catch (error) {
+            console.error("Failed to load chat session count:", error);
+            analyticsModalContent.textContent = error.message || "Unable to load chat session count.";
+        }
+
+        return;
+    }
 
     if (markSoldButton) {
         const card = markSoldButton.closest(".product-card");
