@@ -1,5 +1,3 @@
-// 1. Initialize Supabase Client
-
 const SUPABASE_URL =
     "https://xolodghudewagudmyxos.supabase.co";
 
@@ -17,13 +15,11 @@ const supabaseClient =
     );
 
 
-// 2. DOM Elements
-
 const btnGoogle =
     document.getElementById("btn-google");
 
 
-// 3. Google OAuth Sign-In
+// Google Login
 
 async function signInWithGoogle() {
 
@@ -51,17 +47,12 @@ async function signInWithGoogle() {
 }
 
 
-// 4. Authenticate User With FastAPI
+// Send Supabase session to FastAPI
 
 async function authenticateWithBackend(session) {
 
-    if (!session) {
-        console.log("No session.");
-        return;
-    }
-
     console.log(
-        "Supabase session found."
+        "Authenticating with FastAPI..."
     );
 
     console.log(
@@ -99,11 +90,8 @@ async function authenticateWithBackend(session) {
         if (!response.ok) {
 
             console.error(
-                "FastAPI rejected authentication."
+                "FastAPI rejected user."
             );
-
-            // IMPORTANT:
-            // Do NOT sign out here while debugging.
 
             return;
         }
@@ -114,40 +102,27 @@ async function authenticateWithBackend(session) {
         );
 
 
-        // Only redirect after FastAPI succeeds.
-
         window.location.href =
             "index.html";
 
     } catch (error) {
 
         console.error(
-            "Failed to authenticate with backend:",
+            "FastAPI request failed:",
             error
         );
     }
 }
 
 
-// 5. Google Button
-
-if (btnGoogle) {
-
-    btnGoogle.addEventListener(
-        "click",
-        signInWithGoogle
-    );
-}
-
-
-// 6. Check Supabase Session
+// After Google redirects back
 
 window.addEventListener(
     "DOMContentLoaded",
     async() => {
 
         console.log(
-            "Checking Supabase session..."
+            "Login page loaded."
         );
 
 
@@ -159,12 +134,12 @@ window.addEventListener(
 
 
         console.log(
-            "SESSION:",
+            "Session:",
             session
         );
 
         console.log(
-            "ERROR:",
+            "Session error:",
             error
         );
 
@@ -191,7 +166,7 @@ window.addEventListener(
 
 
         console.log(
-            "OAuth session successfully recovered."
+            "Supabase OAuth successful."
         );
 
         console.log(
@@ -209,3 +184,14 @@ window.addEventListener(
         );
     }
 );
+
+
+// Google button
+
+if (btnGoogle) {
+
+    btnGoogle.addEventListener(
+        "click",
+        signInWithGoogle
+    );
+}
