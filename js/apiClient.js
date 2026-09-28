@@ -443,7 +443,7 @@ export async function loadProducts(productGrid, listStatusText) {
     productGrid.innerHTML = "";
 
     try {
-        const response = await authFetch(`${API_BASE}/Products/list-product`, {
+        const response = await publicFetch(`${API_BASE}/Products/list-product`, {
             method: "GET",
             mode: "cors",
         });
