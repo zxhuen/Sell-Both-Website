@@ -400,7 +400,7 @@ export function createProductCard(product) {
             const pubId = product.public_id || product.publicId || "";
             if (!pubId) return;
 
-            const link = `${window.location.origin}/product.html?public_id=${encodeURIComponent(pubId)}`;
+            const link = `${window.location.origin}/Sell-Both-Website/product.html?public_id=${encodeURIComponent(pubId)}`;
 
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
