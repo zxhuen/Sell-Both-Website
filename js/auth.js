@@ -165,54 +165,25 @@ if (btnLogout) {
 
 // 8. Check Supabase Session After OAuth Redirect
 
-window.addEventListener(
-    "DOMContentLoaded",
-    async() => {
+window.addEventListener("DOMContentLoaded", async() => {
 
-        console.log(
-            "Checking Supabase session..."
-        );
+    console.log("Checking Supabase session...");
 
+    const {
+        data: { session },
+        error
+    } = await supabaseClient.auth.getSession();
 
-        const {
-            data: { session },
-            error
-        } = await supabaseClient.auth.getSession();
+    console.log("SESSION:", session);
+    console.log("ERROR:", error);
 
-
-        if (error) {
-
-            console.error(
-                "Failed to get Supabase session:",
-                error.message
-            );
-
-            return;
-        }
-
-
-        // No session = user isn't logged in.
-
-        if (!session) {
-
-            console.log(
-                "No Supabase session found."
-            );
-
-            return;
-        }
-
-
-        // Supabase session exists.
-
-        console.log(
-            "Supabase session found:",
-            session.user.email
-        );
-
-
-        // Send access token to FastAPI.
-
-        await authenticateWithBackend(session);
+    if (!session) {
+        console.log("No valid Supabase session.");
+        return;
     }
-);
+
+    console.log("User:", session.user);
+    console.log("Access token exists:", !!session.access_token);
+
+    await authenticateWithBackend(session);
+});
