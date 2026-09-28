@@ -8,6 +8,7 @@ const LOGIN_ENDPOINT =
     window.LOGIN_ENDPOINT ||
     "https://sellbot-api.onrender.com/Login/";
 
+
 const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
@@ -15,15 +16,19 @@ const supabaseClient =
     );
 
 
-const btnGoogle =
+const googleBtn =
     document.getElementById("btn-google");
 
 
-// Google Login
+// ============================================================
+// GOOGLE LOGIN
+// ============================================================
 
-async function signInWithGoogle() {
+googleBtn.addEventListener("click", async() => {
 
-    btnGoogle.disabled = true;
+    googleBtn.disabled = true;
+
+    console.log("Starting Google OAuth...");
 
     const { error } =
     await supabaseClient.auth.signInWithOAuth({
@@ -31,23 +36,25 @@ async function signInWithGoogle() {
 
         options: {
             redirectTo: window.location.origin +
-                window.location.pathname,
-        },
+                window.location.pathname
+        }
     });
 
     if (error) {
 
         console.error(
-            "Google OAuth error:",
-            error.message
+            "OAuth trigger error:",
+            error
         );
 
-        btnGoogle.disabled = false;
+        googleBtn.disabled = false;
     }
-}
+});
 
 
-// Send Supabase session to FastAPI
+// ============================================================
+// SEND SUPABASE SESSION TO FASTAPI
+// ============================================================
 
 async function authenticateWithBackend(session) {
 
@@ -60,26 +67,33 @@ async function authenticateWithBackend(session) {
         session.user.email
     );
 
+    console.log(
+        "Access token exists:", !!session.access_token
+    );
+
+
     try {
 
         const response =
             await fetch(LOGIN_ENDPOINT, {
+
                 method: "POST",
 
                 headers: {
-                    Authorization: `Bearer ${session.access_token}`,
-                },
+                    Authorization: `Bearer ${session.access_token}`
+                }
             });
-
-
-        const result =
-            await response.text();
 
 
         console.log(
             "FastAPI status:",
             response.status
         );
+
+
+        const result =
+            await response.text();
+
 
         console.log(
             "FastAPI response:",
@@ -90,7 +104,7 @@ async function authenticateWithBackend(session) {
         if (!response.ok) {
 
             console.error(
-                "FastAPI rejected user."
+                "FastAPI rejected authentication."
             );
 
             return;
@@ -115,7 +129,9 @@ async function authenticateWithBackend(session) {
 }
 
 
-// After Google redirects back
+// ============================================================
+// LOGIN PAGE LOAD
+// ============================================================
 
 window.addEventListener(
     "DOMContentLoaded",
@@ -127,7 +143,9 @@ window.addEventListener(
 
 
         const {
-            data: { session },
+            data: {
+                session
+            },
             error
         } =
         await supabaseClient.auth.getSession();
@@ -137,6 +155,7 @@ window.addEventListener(
             "Session:",
             session
         );
+
 
         console.log(
             "Session error:",
@@ -169,13 +188,10 @@ window.addEventListener(
             "Supabase OAuth successful."
         );
 
+
         console.log(
             "User:",
             session.user.email
-        );
-
-        console.log(
-            "Access token exists:", !!session.access_token
         );
 
 
@@ -184,14 +200,3 @@ window.addEventListener(
         );
     }
 );
-
-
-// Google button
-
-if (btnGoogle) {
-
-    btnGoogle.addEventListener(
-        "click",
-        signInWithGoogle
-    );
-}
