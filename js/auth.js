@@ -1,23 +1,26 @@
 // 1. Initialize Supabase Client
 
-const SUPABASE_URL = "https://xolodghudewagudmyxos.supabase.co";
+const SUPABASE_URL =
+    "https://xolodghudewagudmyxos.supabase.co";
 
 const SUPABASE_ANON_KEY =
     "YOUR_EXISTING_SUPABASE_ANON_KEY";
 
 const LOGIN_ENDPOINT =
-    window.LOGIN_ENDPOINT || "https://sellbot-api.onrender.com/Login/";
+    window.LOGIN_ENDPOINT ||
+    "https://sellbot-api.onrender.com/Login/";
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
 
 
 // 2. DOM Elements
 
-const btnGoogle = document.getElementById("btn-google");
-const btnLogout = document.getElementById("btn-logout");
+const btnGoogle =
+    document.getElementById("btn-google");
 
 
 // 3. Google OAuth Sign-In
@@ -31,8 +34,6 @@ async function signInWithGoogle() {
         provider: "google",
 
         options: {
-            // Return to login page after Google authentication.
-            // The login page will then authenticate with FastAPI.
             redirectTo: window.location.origin +
                 window.location.pathname,
         },
@@ -55,26 +56,34 @@ async function signInWithGoogle() {
 async function authenticateWithBackend(session) {
 
     if (!session) {
+        console.log("No session.");
         return;
     }
 
-    console.log("Supabase session found.");
-    console.log("User:", session.user.email);
+    console.log(
+        "Supabase session found."
+    );
+
+    console.log(
+        "User:",
+        session.user.email
+    );
 
     try {
 
-        const response = await fetch(
-            LOGIN_ENDPOINT, {
+        const response =
+            await fetch(LOGIN_ENDPOINT, {
                 method: "POST",
 
                 headers: {
                     Authorization: `Bearer ${session.access_token}`,
                 },
-            }
-        );
+            });
+
 
         const result =
             await response.text();
+
 
         console.log(
             "FastAPI status:",
@@ -90,25 +99,25 @@ async function authenticateWithBackend(session) {
         if (!response.ok) {
 
             console.error(
-                "FastAPI rejected authentication:",
-                response.status,
-                result
+                "FastAPI rejected authentication."
             );
 
-            await supabaseClient.auth.signOut();
+            // IMPORTANT:
+            // Do NOT sign out here while debugging.
 
             return;
         }
 
 
-        // Backend successfully
-        // authenticated/registered the user.
-
         console.log(
             "Backend authentication successful."
         );
 
-        window.location.href = "index.html";
+
+        // Only redirect after FastAPI succeeds.
+
+        window.location.href =
+            "index.html";
 
     } catch (error) {
 
@@ -120,28 +129,7 @@ async function authenticateWithBackend(session) {
 }
 
 
-// 5. Sign Out
-
-async function signOut() {
-
-    const { error } =
-    await supabaseClient.auth.signOut();
-
-    if (error) {
-
-        console.error(
-            "Sign-out error:",
-            error.message
-        );
-
-        return;
-    }
-
-    window.location.href = "login.html";
-}
-
-
-// 6. Google Button
+// 5. Google Button
 
 if (btnGoogle) {
 
@@ -152,38 +140,72 @@ if (btnGoogle) {
 }
 
 
-// 7. Logout Button
+// 6. Check Supabase Session
 
-if (btnLogout) {
+window.addEventListener(
+    "DOMContentLoaded",
+    async() => {
 
-    btnLogout.addEventListener(
-        "click",
-        signOut
-    );
-}
+        console.log(
+            "Checking Supabase session..."
+        );
 
 
-// 8. Check Supabase Session After OAuth Redirect
+        const {
+            data: { session },
+            error
+        } =
+        await supabaseClient.auth.getSession();
 
-window.addEventListener("DOMContentLoaded", async() => {
 
-    console.log("Checking Supabase session...");
+        console.log(
+            "SESSION:",
+            session
+        );
 
-    const {
-        data: { session },
-        error
-    } = await supabaseClient.auth.getSession();
+        console.log(
+            "ERROR:",
+            error
+        );
 
-    console.log("SESSION:", session);
-    console.log("ERROR:", error);
 
-    if (!session) {
-        console.log("No valid Supabase session.");
-        return;
+        if (error) {
+
+            console.error(
+                "Supabase session error:",
+                error
+            );
+
+            return;
+        }
+
+
+        if (!session) {
+
+            console.log(
+                "No Supabase session."
+            );
+
+            return;
+        }
+
+
+        console.log(
+            "OAuth session successfully recovered."
+        );
+
+        console.log(
+            "User:",
+            session.user.email
+        );
+
+        console.log(
+            "Access token exists:", !!session.access_token
+        );
+
+
+        await authenticateWithBackend(
+            session
+        );
     }
-
-    console.log("User:", session.user);
-    console.log("Access token exists:", !!session.access_token);
-
-    await authenticateWithBackend(session);
-});
+);
