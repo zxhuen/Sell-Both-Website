@@ -133,70 +133,30 @@ async function authenticateWithBackend(session) {
 // LOGIN PAGE LOAD
 // ============================================================
 
-window.addEventListener(
-    "DOMContentLoaded",
-    async() => {
+window.addEventListener("DOMContentLoaded", async() => {
 
-        console.log(
-            "Login page loaded."
-        );
+    console.log("=== LOGIN PAGE LOADED ===");
 
-
-        const {
-            data: {
-                session
-            },
-            error
-        } =
+    const result =
         await supabaseClient.auth.getSession();
 
+    console.log("getSession result:", result);
 
-        console.log(
-            "Session:",
-            session
-        );
+    console.log("session:", result.data.session);
+    console.log("error:", result.error);
 
-
-        console.log(
-            "Session error:",
-            error
-        );
-
-
-        if (error) {
-
-            console.error(
-                "Supabase session error:",
-                error
-            );
-
-            return;
-        }
-
-
-        if (!session) {
-
-            console.log(
-                "No Supabase session."
-            );
-
-            return;
-        }
-
-
-        console.log(
-            "Supabase OAuth successful."
-        );
-
-
-        console.log(
-            "User:",
-            session.user.email
-        );
-
-
-        await authenticateWithBackend(
-            session
-        );
+    if (!result.data.session) {
+        console.log("NO SESSION -> FastAPI will NOT be called");
+        return;
     }
-);
+
+    console.log("SESSION FOUND");
+    console.log("email:", result.data.session.user.email);
+    console.log(
+        "access token exists:", !!result.data.session.access_token
+    );
+
+    await authenticateWithBackend(
+        result.data.session
+    );
+});
