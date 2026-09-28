@@ -1,6 +1,6 @@
 import { supabaseClient } from "./supabase.js";
 
-const API_BASE = window.API_ENDPOINT || "http://localhost:8000";
+const API_BASE = window.API_ENDPOINT || "https://sellbot-api.onrender.com";
 
 // Helper function to escape HTML string input safely
 function escapeHtml(str) {
