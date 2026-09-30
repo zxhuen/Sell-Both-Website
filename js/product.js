@@ -10,7 +10,10 @@ const elements = {
     chatMessages: document.getElementById("chatMessages"),
     chatForm: document.getElementById("chatForm"),
     chatInput: document.getElementById("chatInput"),
+    sendButton: document.querySelector("#chatForm .send-btn"),
 };
+
+let isSendingMessage = false;
 
 function createMessageElement(role, text) {
     const messageWrapper = document.createElement("div");
@@ -59,13 +62,18 @@ function appendChatMessage(role, text) {
 async function handleChatSubmit(event) {
     event.preventDefault();
 
-    if (!elements.chatInput || !elements.chatMessages) {
+    if (!elements.chatInput || !elements.chatMessages || isSendingMessage) {
         return;
     }
 
     const message = elements.chatInput.value.trim();
     if (!message) {
         return;
+    }
+
+    isSendingMessage = true;
+    if (elements.sendButton) {
+        elements.sendButton.disabled = true;
     }
 
     elements.chatInput.value = "";
@@ -81,6 +89,11 @@ async function handleChatSubmit(event) {
     } catch (err) {
         console.error("Failed to send chat message:", err);
         loadingMessage.querySelector(".message-content").textContent = "Unable to get a response. Please try again.";
+    } finally {
+        isSendingMessage = false;
+        if (elements.sendButton) {
+            elements.sendButton.disabled = false;
+        }
     }
 }
 

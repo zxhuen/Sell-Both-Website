@@ -708,6 +708,16 @@ body {
     transform: scale(1.05);
 }
 
+.send-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.send-btn:disabled:hover {
+    background: var(--accent-blue);
+    transform: none;
+}
+
 
 /* Animations */
 
