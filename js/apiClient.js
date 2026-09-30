@@ -281,7 +281,7 @@ export async function sendLunaMessage(message, publicId) {
         throw new Error("Public id is required for chat");
     }
 
-    const response = await publicFetch(`${API_BASE}/Chat/Luna?public_id=${encodeURIComponent(publicId)}`, {
+    const response = await fetch(`${API_BASE}/Chat/Luna?public_id=${encodeURIComponent(publicId)}`, {
         method: "POST",
         mode: "cors",
         credentials: "include",
