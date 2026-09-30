@@ -93,6 +93,7 @@ async function handleChatSubmit(event) {
         isSendingMessage = false;
         if (elements.sendButton) {
             elements.sendButton.disabled = false;
+
         }
     }
 }
