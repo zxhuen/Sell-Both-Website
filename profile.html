@@ -193,6 +193,46 @@
             background: var(--danger-red);
             color: #ffffff;
         }
+        
+        .confirm-dialog {
+            width: calc(100% - 2rem);
+            max-width: 420px;
+            margin: auto;
+            padding: 1.5rem;
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .confirm-dialog::backdrop {
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: var(--backdrop-blur);
+        }
+        
+        .confirm-dialog h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .confirm-dialog p {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .confirm-dialog-error {
+            margin-top: 0.75rem;
+            color: var(--danger-red) !important;
+        }
+        
+        .confirm-dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            margin-top: 1.5rem;
+        }
         /* Profile Layout */
         
         .profile-container {
@@ -356,6 +396,11 @@
                 align-items: flex-start;
                 padding: 1.25rem;
             }
+            .profile-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.65rem;
+            }
             .user-info {
                 align-items: flex-start;
                 gap: 1rem;
@@ -410,7 +455,10 @@
                     <p id="profile-email">Loading...</p>
                 </div>
             </div>
-            <button class="secondary-btn">manage subscription</button>
+            <div class="profile-actions">
+                <button class="secondary-btn" type="button">Manage subscription</button>
+                <button class="danger-btn" id="logoutBtn" type="button">Log out</button>
+            </div>
         </section>
 
         <!-- Usage & Subscription Statistics -->
@@ -447,6 +495,16 @@
 
     </main>
 
+    <dialog class="confirm-dialog" id="logoutDialog" aria-labelledby="logoutDialogTitle">
+        <h2 id="logoutDialogTitle">Log out?</h2>
+        <p>Are you sure you want to log out of your account?</p>
+        <p class="confirm-dialog-error" id="logoutError" role="alert" hidden></p>
+        <form method="dialog" class="confirm-dialog-actions">
+            <button class="secondary-btn" type="submit" value="cancel">Cancel</button>
+            <button class="danger-btn" id="confirmLogoutBtn" type="button">Log out</button>
+        </form>
+    </dialog>
+
     <script type="module">
         import { getUserProfile } from "./js/apiClient.js"; async function initProfile() { try { const user = await getUserProfile(); if (!user) return; const profileAvatar = document.getElementById("profile-avatar"); const profileName = document.getElementById("profile-name");
         const profileEmail = document.getElementById("profile-email"); const subscriptionName = document.getElementById("subscription-name"); const productsCreated = document.getElementById("products-created"); const productLimit = document.getElementById("product-limit");
@@ -455,6 +513,12 @@
         ?? 0; if (productLimit) productLimit.textContent = user.subscription?.daily_product_limit ?? 0; if (maxProducts) maxProducts.textContent = user.subscription?.max_products ?? 0; const limit = user.subscription?.daily_product_limit || 0; const created
         = user.usage?.products_created_today || 0; const percent = limit > 0 ? Math.min(100, Math.round((created / limit) * 100)) : 0; if (usageProgress) { usageProgress.style.width = `${percent}%`; } } catch (error) { console.error("Unable to load profile:",
         error); } } document.addEventListener("DOMContentLoaded", initProfile);
+    </script>
+
+    <script type="module">
+        import { supabaseClient } from "./js/supabase.js"; const logoutDialog = document.getElementById("logoutDialog"); const logoutError = document.getElementById("logoutError"); const confirmLogoutButton = document.getElementById("confirmLogoutBtn"); document.getElementById("logoutBtn").addEventListener("click",
+        () => { logoutError.hidden = true; logoutDialog.showModal(); }); confirmLogoutButton.addEventListener("click", async() => { confirmLogoutButton.disabled = true; logoutError.hidden = true; try { const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error; window.location.href = "login.html"; } catch (error) { logoutError.textContent = error.message || "Unable to log out. Please try again."; logoutError.hidden = false; confirmLogoutButton.disabled = false; } });
     </script>
 
 </body>
