@@ -22,13 +22,13 @@
         </a>
 
         <!-- Product Summary Section -->
-        <div class="product-hero-card" id="productHero">
+        <div class="product-hero-card" id="productHero" aria-busy="true">
             <div class="product-hero-header">
                 <div>
                     <span class="product-badge">Product Overview</span>
-                    <h1 id="productTitle" class="product-hero-title">Spatial Audio Headphones Pro</h1>
+                    <h1 id="productTitle" class="product-hero-title"><span class="skeleton skeleton-title" aria-hidden="true"></span></h1>
                 </div>
-                <div class="price-tag" id="productPrice">$349.00</div>
+                <div class="price-tag" id="productPrice"><span class="skeleton skeleton-price" aria-hidden="true"></span></div>
             </div>
 
 
@@ -51,12 +51,10 @@
             </div>
 
             <!-- Scrollable Message Stream -->
-            <div class="chat-messages" id="chatMessages">
+            <div class="chat-messages" id="chatMessages" aria-busy="true">
                 <div class="message assistant-message">
-                    <div class="message-avatar">
-                        <img src="images/marin.png" alt="Marin assistant" />
-                    </div>
-                    <div class="message-content">Loading chat history...</div>
+                    <div class="message-avatar skeleton" aria-hidden="true"></div>
+                    <div class="message-content skeleton skeleton-chat" aria-hidden="true"></div>
                 </div>
             </div>
 

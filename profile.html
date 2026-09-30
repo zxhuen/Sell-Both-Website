@@ -338,6 +338,64 @@
             border-radius: 980px;
             margin-top: 0.5rem;
         }
+        
+        .skeleton {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            background: #e9e9ed;
+            border-radius: 6px;
+        }
+        
+        .skeleton::after {
+            position: absolute;
+            inset: 0;
+            content: "";
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+            animation: skeleton-shimmer 1.4s ease-in-out infinite;
+        }
+        
+        .skeleton-profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        
+        .skeleton-profile-name {
+            width: 11rem;
+            height: 1.4rem;
+        }
+        
+        .skeleton-profile-email {
+            width: 13rem;
+            max-width: 100%;
+            height: 0.9rem;
+        }
+        
+        .skeleton-profile-badge {
+            width: 3.5rem;
+            height: 0.75rem;
+        }
+        
+        .skeleton-stat-value {
+            display: inline-block;
+            width: 5rem;
+            height: 1.5rem;
+            vertical-align: middle;
+        }
+        
+        @keyframes skeleton-shimmer {
+            to {
+                transform: translateX(100%);
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .skeleton::after {
+                animation: none;
+            }
+        }
         /* Progress Bar for Limits */
         
         .progress-bar-container {
@@ -447,12 +505,13 @@
     <main class="profile-container">
 
         <!-- User Identity Card -->
-        <section class="profile-hero">
+        <section class="profile-hero" id="profileHero" aria-busy="true">
             <div class="user-info">
-                <img id="profile-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256" alt="Avatar Placeholder" class="avatar">
+                <div class="avatar skeleton skeleton-profile-avatar profile-skeleton" id="profileAvatarSkeleton" aria-hidden="true"></div>
+                <img id="profile-avatar" alt="User avatar" class="avatar" hidden>
                 <div class="details">
-                    <h2 id="profile-name">Loading...</h2>
-                    <p id="profile-email">Loading...</p>
+                    <h2 id="profile-name"><span class="skeleton skeleton-profile-name profile-skeleton" aria-hidden="true"></span></h2>
+                    <p id="profile-email"><span class="skeleton skeleton-profile-email profile-skeleton" aria-hidden="true"></span></p>
                 </div>
             </div>
             <div class="profile-actions">
@@ -462,32 +521,33 @@
         </section>
 
         <!-- Usage & Subscription Statistics -->
-        <section class="stats-grid">
+        <section class="stats-grid" id="profileStats" aria-busy="true">
 
             <!-- Subscription Type Card -->
             <article class="stat-card">
                 <div class="stat-label">Subscription Tier</div>
-                <div class="stat-value" id="subscription-name">Free</div>
-                <span class="badge">Active</span>
+                <div class="stat-value" id="subscription-name"><span class="skeleton skeleton-stat-value profile-skeleton" aria-hidden="true"></span></div>
+                <span class="badge" id="subscriptionBadge"><span class="skeleton skeleton-profile-badge profile-skeleton" aria-hidden="true"></span></span>
             </article>
 
             <!-- Daily Usage Limit -->
             <article class="stat-card">
                 <div class="stat-label">Products Created Today</div>
                 <div class="stat-value">
-                    <span id="products-created">0</span>
-                    <span style="font-size: 1rem; color: var(--text-secondary); font-weight: 400;">/ <span id="product-limit">0</span></span>
+                    <span id="products-created"><span class="skeleton skeleton-stat-value profile-skeleton" aria-hidden="true"></span></span>
+                    <span style="font-size: 1rem; color: var(--text-secondary); font-weight: 400;">/ <span id="product-limit"><span class="skeleton skeleton-stat-value profile-skeleton" aria-hidden="true"></span></span>
+                    </span>
                 </div>
                 <div class="stat-subtext">Resets every 24 hours after the first product created</div>
                 <div class="progress-bar-container">
-                    <div class="progress-bar" id="usage-progress" style="width: 0%;"></div>
+                    <div class="progress-bar skeleton profile-skeleton" id="usage-progress" style="width: 100%;" aria-hidden="true"></div>
                 </div>
             </article>
 
             <!-- Total Capacity Limit -->
             <article class="stat-card">
                 <div class="stat-label">Max Product Capacity</div>
-                <div class="stat-value" id="max-products">0</div>
+                <div class="stat-value" id="max-products"><span class="skeleton skeleton-stat-value profile-skeleton" aria-hidden="true"></span></div>
                 <div class="stat-subtext">Total allowed catalog items</div>
             </article>
 
@@ -506,14 +566,74 @@
     </dialog>
 
     <script type="module">
-        import { getUserProfile } from "./js/apiClient.js"; async function initProfile() { try { const user = await getUserProfile(); if (!user) return; const profileAvatar = document.getElementById("profile-avatar"); const profileName = document.getElementById("profile-name");
-        const profileEmail = document.getElementById("profile-email"); const subscriptionName = document.getElementById("subscription-name"); const productsCreated = document.getElementById("products-created"); const productLimit = document.getElementById("product-limit");
-        const usageProgress = document.getElementById("usage-progress"); const maxProducts = document.getElementById("max-products"); if (user.avatar_url && profileAvatar) { profileAvatar.src = user.avatar_url; } if (profileName) profileName.textContent
-        = user.display_name || "User"; if (profileEmail) profileEmail.textContent = user.email || ""; if (subscriptionName) subscriptionName.textContent = user.subscription?.name || "Free Plan"; if (productsCreated) productsCreated.textContent = user.usage?.products_created_today
-        ?? 0; if (productLimit) productLimit.textContent = user.subscription?.daily_product_limit ?? 0; if (maxProducts) maxProducts.textContent = user.subscription?.max_products ?? 0; const limit = user.subscription?.daily_product_limit || 0; const created
-        = user.usage?.products_created_today || 0; const percent = limit > 0 ? Math.min(100, Math.round((created / limit) * 100)) : 0; if (usageProgress) { usageProgress.style.width = `${percent}%`; } } catch (error) { console.error("Unable to load profile:",
-        error); } } document.addEventListener("DOMContentLoaded", initProfile);
-    </script>
+    import { getUserProfile } from "./js/apiClient.js";
+
+    async function initProfile() {
+        const profileHero = document.getElementById("profileHero");
+        const profileStats = document.getElementById("profileStats");
+        const profileAvatar = document.getElementById("profile-avatar");
+        const profileName = document.getElementById("profile-name");
+        const profileEmail = document.getElementById("profile-email");
+        const subscriptionName = document.getElementById("subscription-name");
+        const subscriptionBadge = document.getElementById("subscriptionBadge");
+        const productsCreated = document.getElementById("products-created");
+        const productLimit = document.getElementById("product-limit");
+        const usageProgress = document.getElementById("usage-progress");
+        const maxProducts = document.getElementById("max-products");
+
+        try {
+            const user = await getUserProfile();
+            if (!user) return;
+
+            if (user.avatar_url && profileAvatar) {
+                profileAvatar.src = user.avatar_url;
+                profileAvatar.hidden = false;
+            }
+
+            if (profileName) profileName.textContent = user.display_name || "User";
+            if (profileEmail) profileEmail.textContent = user.email || "";
+            if (subscriptionName) subscriptionName.textContent = user.subscription?.name || "Free Plan";
+            if (subscriptionBadge) subscriptionBadge.textContent = "Active";
+            
+            if (productsCreated) productsCreated.textContent = user.usage?.products_created_today ?? 0;
+            if (productLimit) productLimit.textContent = user.subscription?.daily_product_limit ?? 0;
+            if (maxProducts) maxProducts.textContent = user.subscription?.max_products ?? 0; 
+
+            const limit = user.subscription?.daily_product_limit || 0;
+            const created = user.usage?.products_created_today || 0;
+            const percent = limit > 0 ? Math.min(100, Math.round((created / limit) * 100)) : 0;
+
+            if (usageProgress) {
+                usageProgress.style.width = `${percent}%`;
+                usageProgress.classList.remove("skeleton", "profile-skeleton");
+            }
+
+            document.querySelectorAll(".profile-skeleton").forEach((element) => element.remove());
+            
+            profileHero?.setAttribute("aria-busy", "false");
+            profileStats?.setAttribute("aria-busy", "false");
+
+        } catch (error) {
+            console.error("Unable to load profile:", error);
+            
+            document.querySelectorAll(".profile-skeleton").forEach((element) => element.remove());
+            usageProgress?.classList.remove("skeleton", "profile-skeleton");
+
+            if (profileName) profileName.textContent = "Unable to load profile";
+            if (profileEmail) profileEmail.textContent = "";
+            if (subscriptionName) subscriptionName.textContent = "Unavailable";
+            if (subscriptionBadge) subscriptionBadge.textContent = "Unavailable";
+            if (productsCreated) productsCreated.textContent = "N/A";
+            if (productLimit) productLimit.textContent = "N/A";
+            if (maxProducts) maxProducts.textContent = "N/A";
+
+            profileHero?.setAttribute("aria-busy", "false");
+            profileStats?.setAttribute("aria-busy", "false");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", initProfile);
+</script>
 
     <script type="module">
         import { supabaseClient } from "./js/supabase.js"; const logoutDialog = document.getElementById("logoutDialog"); const logoutError = document.getElementById("logoutError"); const confirmLogoutButton = document.getElementById("confirmLogoutBtn"); document.getElementById("logoutBtn").addEventListener("click",

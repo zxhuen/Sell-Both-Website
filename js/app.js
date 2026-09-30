@@ -39,9 +39,17 @@ function closeModal() {
 
 function openAnalyticsModal(productId) {
     analyticsModalProductId.textContent = `Product ID: ${productId}`;
-    analyticsModalContent.textContent = "Loading chat session count...";
+    analyticsModalContent.textContent = "";
+    analyticsModalContent.classList.add("skeleton", "analytics-content-skeleton");
+    analyticsModalContent.setAttribute("aria-busy", "true");
     analyticsModal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
+}
+
+function setAnalyticsModalContent(content) {
+    analyticsModalContent.classList.remove("skeleton", "analytics-content-skeleton");
+    analyticsModalContent.setAttribute("aria-busy", "false");
+    analyticsModalContent.textContent = content;
 }
 
 function closeAnalyticsModal() {
@@ -197,10 +205,10 @@ productGrid.addEventListener("click", async(e) => {
 
         try {
             const payload = await getChatSessionCount(productId);
-            analyticsModalContent.textContent = JSON.stringify(payload, null, 2);
+            setAnalyticsModalContent(JSON.stringify(payload, null, 2));
         } catch (error) {
             console.error("Failed to load chat session count:", error);
-            analyticsModalContent.textContent = error.message || "Unable to load chat session count.";
+            setAnalyticsModalContent(error.message || "Unable to load chat session count.");
         }
 
         return;

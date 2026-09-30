@@ -4,6 +4,7 @@ const params = new URLSearchParams(window.location.search);
 const publicId = params.get("public_id") || params.get("id");
 
 const elements = {
+    productHero: document.getElementById("productHero"),
     title: document.getElementById("productTitle"),
     price: document.getElementById("productPrice"),
     description: document.getElementById("productDescription"),
@@ -41,6 +42,7 @@ function renderChatMessages(messages, container) {
     if (!container) return;
 
     container.innerHTML = "";
+    container.setAttribute("aria-busy", "false");
 
     if (!Array.isArray(messages) || messages.length === 0) {
         const emptyState = createMessageElement("assistant", "No chat history yet for this product.");
@@ -79,16 +81,23 @@ async function handleChatSubmit(event) {
     elements.chatInput.value = "";
     appendChatMessage("user", message);
 
-    const loadingMessage = createMessageElement("assistant", "Typing...");
+    const loadingMessage = createMessageElement("assistant", "");
+    const loadingContent = loadingMessage.querySelector(".message-content");
+    loadingContent.classList.add("skeleton", "skeleton-chat");
+    loadingContent.setAttribute("aria-hidden", "true");
     elements.chatMessages.appendChild(loadingMessage);
     elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
 
     try {
         const assistantText = await sendLunaMessage(message, publicId);
-        loadingMessage.querySelector(".message-content").textContent = assistantText || "No response received.";
+        loadingContent.classList.remove("skeleton", "skeleton-chat");
+        loadingContent.removeAttribute("aria-hidden");
+        loadingContent.textContent = assistantText || "No response received.";
     } catch (err) {
         console.error("Failed to send chat message:", err);
-        loadingMessage.querySelector(".message-content").textContent = "Unable to get a response. Please try again.";
+        loadingContent.classList.remove("skeleton", "skeleton-chat");
+        loadingContent.removeAttribute("aria-hidden");
+        loadingContent.textContent = "Unable to get a response. Please try again.";
     } finally {
         isSendingMessage = false;
         if (elements.sendButton) {
@@ -114,7 +123,12 @@ async function fetchProductDetails() {
 }
 
 async function fetchChatHistory() {
-    if (!publicId || !elements.chatMessages) {
+    if (!elements.chatMessages) {
+        return;
+    }
+
+    if (!publicId) {
+        renderChatMessages([], elements.chatMessages);
         return;
     }
 

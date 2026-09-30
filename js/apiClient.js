@@ -332,6 +332,10 @@ export function renderProductCard(product, elements) {
         elements.title.textContent = title;
     }
 
+    if (elements && elements.productHero) {
+        elements.productHero.setAttribute("aria-busy", "false");
+    }
+
     if (elements && elements.price) {
         elements.price.textContent = `₱${price.toFixed(2)}`;
     }
@@ -348,6 +352,10 @@ export function renderNotFound(elements) {
 
     if (elements && elements.price) {
         elements.price.textContent = "₱0.00";
+    }
+
+    if (elements && elements.productHero) {
+        elements.productHero.setAttribute("aria-busy", "false");
     }
 
     if (elements && elements.description) {
@@ -439,8 +447,30 @@ export function createProductCard(product) {
 export async function loadProducts(productGrid, listStatusText) {
     if (!listStatusText) return;
 
-    listStatusText.textContent = "Loading products...";
-    productGrid.innerHTML = "";
+    listStatusText.textContent = "";
+    productGrid.setAttribute("aria-busy", "true");
+    productGrid.replaceChildren();
+
+    for (let index = 0; index < 3; index += 1) {
+        const skeletonCard = document.createElement("div");
+        skeletonCard.className = "product-card product-card-skeleton";
+        skeletonCard.setAttribute("aria-hidden", "true");
+        skeletonCard.innerHTML = `
+            <div class="product-content">
+                <span class="skeleton skeleton-bar skeleton-product-title"></span>
+                <span class="skeleton skeleton-bar skeleton-product-description"></span>
+                <span class="skeleton skeleton-bar skeleton-product-id"></span>
+            </div>
+            <div class="product-meta">
+                <span class="skeleton skeleton-product-price"></span>
+                <div class="actions">
+                    <span class="skeleton skeleton-product-action"></span>
+                    <span class="skeleton skeleton-product-action"></span>
+                </div>
+            </div>
+        `;
+        productGrid.appendChild(skeletonCard);
+    }
 
     try {
         const response = await authFetch(`${API_BASE}/Products/list-product`, {
@@ -448,7 +478,11 @@ export async function loadProducts(productGrid, listStatusText) {
             mode: "cors",
         });
 
-        if (!response) return;
+        if (!response) {
+            productGrid.replaceChildren();
+            productGrid.setAttribute("aria-busy", "false");
+            return;
+        }
 
         const statusTextResponse = response.statusText;
 
@@ -463,6 +497,8 @@ export async function loadProducts(productGrid, listStatusText) {
         }
 
         const products = await response.json();
+        productGrid.replaceChildren();
+        productGrid.setAttribute("aria-busy", "false");
 
         if (!Array.isArray(products) || products.length === 0) {
             listStatusText.textContent = "No products found.";
@@ -475,6 +511,8 @@ export async function loadProducts(productGrid, listStatusText) {
 
         listStatusText.textContent = "";
     } catch (error) {
+        productGrid.replaceChildren();
+        productGrid.setAttribute("aria-busy", "false");
         console.error("Failed to load products:", error);
         listStatusText.textContent = error.message || "Could not load products.";
     }

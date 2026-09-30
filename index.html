@@ -58,8 +58,8 @@
 
     <main>
 
-        <div class="product-grid" id="productGrid"></div>
-        <p class="list-status" id="listStatusText" aria-live="polite">Loading products...</p>
+        <div class="product-grid" id="productGrid" aria-busy="true"></div>
+        <p class="list-status" id="listStatusText" aria-live="polite"></p>
 
     </main>
 
@@ -142,8 +142,8 @@
 
             </div>
 
-            <p id="analyticsModalProductId" class="analytics-product-id-text">Product ID: --</p>
-            <pre id="analyticsModalContent" class="analytics-content">Loading...</pre>
+            <p id="analyticsModalProductId" class="analytics-product-id-text"></p>
+            <pre id="analyticsModalContent" class="analytics-content" aria-live="polite"></pre>
 
         </div>
 
