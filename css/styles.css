@@ -55,6 +55,17 @@ body {
     margin: 0 auto;
 }
 
+.compatibility-notice {
+    margin-bottom: 1.5rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid #f0d48a;
+    border-radius: var(--radius-md);
+    background: #fff8e5;
+    color: #5c4600;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
 .skeleton {
     position: relative;
     overflow: hidden;
