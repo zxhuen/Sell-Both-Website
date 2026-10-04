@@ -22,7 +22,7 @@
 <body>
 
     <p class="compatibility-notice" role="note">
-         notice: SellBot doesn't work on Brave or iOS devices yet.
+        Compatibility notice: SellBot does not currently work in Brave or on iOS devices.
     </p>
 
     <!-- NAVIGATION BAR -->
@@ -54,7 +54,7 @@
 
     <section class="toolbar">
 
-        <input type="text" placeholder="Search products..." class="search-input">
+        <input type="search" placeholder="Search products..." class="search-input" aria-label="Search products">
 
     </section>
 
@@ -72,13 +72,13 @@
 
     <!-- ================= MODAL ================= -->
 
-    <div class="modal hidden" id="productModal">
+    <div class="modal hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="createProductTitle">
 
-        <div class="modal-card">
+        <div class="modal-card" tabindex="-1">
 
             <div class="modal-header">
 
-                <h2>Create Product</h2>
+                <h2 id="createProductTitle">Create Product</h2>
 
                 <button class="close-btn" id="closeModalBtn">
                     ×
@@ -91,33 +91,33 @@
 
                 <div class="input-group">
 
-                    <label>
+                    <label for="productName">
                         Product Name
                     </label>
 
-                    <input type="text" placeholder="Wireless Mouse" required>
+                    <input id="productName" type="text" placeholder="Wireless Mouse" autocomplete="off" required>
 
                 </div>
 
 
                 <div class="input-group">
 
-                    <label>
+                    <label for="productPrice">
                         Price
                     </label>
 
-                    <input type="number" step="0.01" placeholder="29.99" required>
+                    <input id="productPrice" type="number" step="0.01" min="0" inputmode="decimal" placeholder="29.99" required>
 
                 </div>
 
 
                 <div class="input-group">
 
-                    <label>
+                    <label for="productDescription">
                         Description
                     </label>
 
-                    <textarea rows="4" placeholder="Describe your product..."></textarea>
+                    <textarea id="productDescription" rows="4" placeholder="Describe your product..."></textarea>
 
                 </div>
 
@@ -133,13 +133,13 @@
 
     </div>
 
-    <div class="modal hidden" id="analyticsModal">
+    <div class="modal hidden" id="analyticsModal" role="dialog" aria-modal="true" aria-labelledby="analyticsTitle">
 
-        <div class="modal-card analytics-modal-card">
+        <div class="modal-card analytics-modal-card" tabindex="-1">
 
             <div class="modal-header">
 
-                <h2>Chat Session Count</h2>
+                <h2 id="analyticsTitle">Chat Session Count</h2>
 
                 <button class="close-btn" id="closeAnalyticsModalBtn">
                     ×

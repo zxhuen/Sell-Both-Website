@@ -15,7 +15,7 @@
 <body>
 
     <p class="compatibility-notice" role="note">
-        Compatibility notice: SellBot doesn't work on Brave or iOS devices yet. APP IS STILL IN DEVELOPMENT
+        Compatibility notice: SellBot does not currently work in Brave or on iOS devices.
     </p>
 
     <!-- ===========================
@@ -35,8 +35,9 @@
                 </div>
                 <div class="price-tag" id="productPrice"><span class="skeleton skeleton-price" aria-hidden="true"></span></div>
             </div>
-
-
+            <p class="product-hero-description" id="productDescription">
+                <span class="skeleton skeleton-description" aria-hidden="true"></span>
+            </p>
         </div>
     </header>
 
@@ -56,7 +57,7 @@
             </div>
 
             <!-- Scrollable Message Stream -->
-            <div class="chat-messages" id="chatMessages" aria-busy="true">
+            <div class="chat-messages" id="chatMessages" aria-busy="true" aria-live="polite">
                 <div class="message assistant-message">
                     <div class="message-avatar skeleton" aria-hidden="true"></div>
                     <div class="message-content skeleton skeleton-chat" aria-hidden="true"></div>

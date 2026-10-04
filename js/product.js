@@ -137,7 +137,10 @@ async function fetchChatHistory() {
         renderChatMessages(messages, elements.chatMessages);
     } catch (err) {
         console.error("Failed to load chat history:", err);
-        renderChatMessages([], elements.chatMessages);
+        elements.chatMessages.replaceChildren(
+            createMessageElement("assistant", "Chat history couldn't be loaded. Please refresh to try again.")
+        );
+        elements.chatMessages.setAttribute("aria-busy", "false");
     }
 }
 
@@ -146,8 +149,7 @@ async function initializePage() {
         elements.chatForm.addEventListener("submit", handleChatSubmit);
     }
 
-    await fetchProductDetails();
-    await fetchChatHistory();
+    await Promise.all([fetchProductDetails(), fetchChatHistory()]);
 }
 
 initializePage();

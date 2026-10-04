@@ -18,6 +18,8 @@ const supabaseClient =
 
 const googleBtn =
     document.getElementById("btn-google");
+const loginStatus =
+    document.getElementById("loginStatus");
 
 
 // ============================================================
@@ -27,26 +29,29 @@ const googleBtn =
 googleBtn.addEventListener("click", async() => {
 
     googleBtn.disabled = true;
+    loginStatus.hidden = false;
+    loginStatus.setAttribute("role", "status");
+    loginStatus.textContent = "Connecting to Google…";
 
     console.log("Starting Google OAuth...");
 
-    const { error } =
-    await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
+    try {
+        const { error } =
+        await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
 
-        options: {
-            redirectTo: window.location.origin +
-                window.location.pathname
-        }
-    });
+            options: {
+                redirectTo: window.location.origin +
+                    window.location.pathname
+            }
+        });
 
-    if (error) {
+        if (error) throw error;
+    } catch (error) {
+        console.error("OAuth trigger error:", error);
 
-        console.error(
-            "OAuth trigger error:",
-            error
-        );
-
+        loginStatus.setAttribute("role", "alert");
+        loginStatus.textContent = error.message || "Unable to start Google sign-in. Please try again.";
         googleBtn.disabled = false;
     }
 });
@@ -106,6 +111,9 @@ async function authenticateWithBackend(session) {
             console.error(
                 "FastAPI rejected authentication."
             );
+            loginStatus.hidden = false;
+            loginStatus.setAttribute("role", "alert");
+            loginStatus.textContent = "We couldn't finish signing you in. Please try again.";
 
             return;
         }
@@ -125,6 +133,9 @@ async function authenticateWithBackend(session) {
             "FastAPI request failed:",
             error
         );
+        loginStatus.hidden = false;
+        loginStatus.setAttribute("role", "alert");
+        loginStatus.textContent = "We couldn't reach SellBot. Check your connection and try again.";
     }
 }
 

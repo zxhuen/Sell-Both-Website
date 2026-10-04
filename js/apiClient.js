@@ -384,7 +384,7 @@ export function createProductCard(product) {
             <h2>${safeTitle}</h2>
             <p>${safeDescription}</p>
             <p class="product-public-id">Public ID: ${safePublicId}</p>
-            <div class="product-card-description" style="display:none;">${safeDescription}</div>
+            <div class="product-card-description" hidden>${safeDescription}</div>
         </div>
         <div class="product-meta">
             <span class="price">₱${safePrice.toFixed(2)}</span>
@@ -437,7 +437,7 @@ export function createProductCard(product) {
         card.classList.toggle("expanded");
         const desc = card.querySelector(".product-card-description");
         if (desc) {
-            desc.style.display = card.classList.contains("expanded") ? "block" : "none";
+            desc.hidden = !card.classList.contains("expanded");
         }
     });
 
@@ -463,9 +463,13 @@ export async function loadProducts(productGrid, listStatusText) {
             </div>
             <div class="product-meta">
                 <span class="skeleton skeleton-product-price"></span>
+                <span class="skeleton skeleton-product-status"></span>
                 <div class="actions">
-                    <span class="skeleton skeleton-product-action"></span>
-                    <span class="skeleton skeleton-product-action"></span>
+                    <span class="skeleton skeleton-product-action action-count"></span>
+                    <span class="skeleton skeleton-product-action action-open"></span>
+                    <span class="skeleton skeleton-product-action action-delete"></span>
+                    <span class="skeleton skeleton-product-action action-sold"></span>
+                    <span class="skeleton skeleton-product-action action-copy"></span>
                 </div>
             </div>
         `;

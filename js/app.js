@@ -21,11 +21,13 @@ const priceInput = productForm.querySelector('input[placeholder="29.99"]');
 const descriptionInput = productForm.querySelector("textarea");
 const submitButton = productForm.querySelector('button[type="submit"]');
 const statusText = document.getElementById("productStatusText");
+let lastFocusedElement = null;
 
 // ==========================================================================
 // MODAL CONTROLS
 // ==========================================================================
 function openModal() {
+    lastFocusedElement = document.activeElement;
     productModal.classList.remove("hidden");
     document.body.style.overflow = "hidden"; // Prevent background scrolling
     nameInput.focus();
@@ -35,15 +37,21 @@ function closeModal() {
     productModal.classList.add("hidden");
     document.body.style.overflow = "";
     productForm.reset();
+    statusText.textContent = "";
+    if (lastFocusedElement instanceof HTMLElement) {
+        lastFocusedElement.focus();
+    }
 }
 
 function openAnalyticsModal(productId) {
+    lastFocusedElement = document.activeElement;
     analyticsModalProductId.textContent = `Product ID: ${productId}`;
     analyticsModalContent.textContent = "";
     analyticsModalContent.classList.add("skeleton", "analytics-content-skeleton");
     analyticsModalContent.setAttribute("aria-busy", "true");
     analyticsModal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
+    closeAnalyticsModalBtn.focus();
 }
 
 function setAnalyticsModalContent(content) {
@@ -56,6 +64,9 @@ function closeAnalyticsModal() {
     analyticsModal.classList.add("hidden");
     if (productModal && productModal.classList.contains("hidden")) {
         document.body.style.overflow = "";
+    }
+    if (lastFocusedElement instanceof HTMLElement) {
+        lastFocusedElement.focus();
     }
 }
 
@@ -72,6 +83,26 @@ productModal.addEventListener("click", (e) => {
 
 // Close modal on Escape key press
 document.addEventListener("keydown", (e) => {
+    const activeModal = !productModal.classList.contains("hidden") ?
+        productModal :
+        !analyticsModal.classList.contains("hidden") ? analyticsModal : null;
+
+    if (activeModal && e.key === "Tab") {
+        const focusableElements = activeModal.querySelectorAll(
+            'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+        }
+    }
+
     if (e.key === "Escape") {
         if (!productModal.classList.contains("hidden")) {
             closeModal();
@@ -86,7 +117,8 @@ document.addEventListener("keydown", (e) => {
 // ==========================================================================
 searchInput.addEventListener("input", (e) => {
     const query = e.target.value.toLowerCase().trim();
-    const cards = document.querySelectorAll(".product-card");
+    const cards = document.querySelectorAll(".product-card:not(.product-card-skeleton)");
+    let visibleCount = 0;
 
     cards.forEach((card) => {
         const title = card.querySelector("h2").textContent.toLowerCase();
@@ -103,7 +135,14 @@ searchInput.addEventListener("input", (e) => {
         // Preserve original card layout (grid) by clearing the display
         // when visible; set to 'none' when not matching.
         card.style.display = matches ? "" : "none";
+        if (matches) visibleCount += 1;
     });
+
+    if (productGrid.getAttribute("aria-busy") !== "true") {
+        listStatusText.textContent = query && cards.length > 0 && visibleCount === 0 ?
+            "No products match your search." :
+            cards.length === 0 ? "No products found." : "";
+    }
 });
 
 // ==========================================================================
