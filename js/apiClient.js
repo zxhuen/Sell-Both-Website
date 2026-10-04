@@ -132,7 +132,7 @@ export async function markProductAsSold(productId) {
     }
 
     const response = await authFetch(`${API_BASE}/Products/mark-as-sold?id=${encodeURIComponent(productId)}`, {
-        method: "GET",
+        method: "PATCH",
         mode: "cors",
     });
 
