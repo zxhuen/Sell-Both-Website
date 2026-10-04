@@ -1227,6 +1227,66 @@ button:disabled {
     overflow-wrap: anywhere;
 }
 
+.product-social-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(20, 95, 204, 0.2);
+    border-radius: var(--radius-md);
+    background: #f0f5fd;
+}
+
+.product-social-link[hidden] {
+    display: none;
+}
+
+.product-social-link-label {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.product-social-link p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+}
+
+.product-social-link a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--accent-blue);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.product-social-link a:hover {
+    background: var(--accent-blue-hover);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+    .product-social-link {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
 .skeleton-description {
     display: block;
     width: min(42rem, 86%);

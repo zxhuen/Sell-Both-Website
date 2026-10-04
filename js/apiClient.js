@@ -182,9 +182,10 @@ export async function getProductByPublicId(publicId) {
         throw new Error("Public id is required");
     }
 
-    const response = await publicFetch(`${API_BASE}/Products/get-product-public-id?public_id=${encodeURIComponent(publicId)}`, {
+    const response = await fetch(`${API_BASE}/Products/get-product-public-id?public_id=${encodeURIComponent(publicId)}`, {
         method: "GET",
         mode: "cors",
+        credentials: "omit",
     });
 
     const statusText = response ? response.statusText : undefined;
@@ -343,6 +344,24 @@ export function renderProductCard(product, elements) {
     if (elements && elements.description) {
         elements.description.textContent = description;
     }
+
+    if (elements && elements.socialLink && elements.socialLinkAnchor && elements.socialLinkHost) {
+        elements.socialLink.hidden = true;
+        const contactLinkValue = product && product.contact_link;
+        if (typeof contactLinkValue === "string") {
+            try {
+                const contactLink = new URL(contactLinkValue);
+                if (contactLink.protocol === "http:" || contactLink.protocol === "https:") {
+                    elements.socialLinkAnchor.href = contactLink.href;
+                    elements.socialLinkAnchor.title = contactLink.href;
+                    elements.socialLinkHost.textContent = contactLink.hostname;
+                    elements.socialLink.hidden = false;
+                }
+            } catch {
+                // Hide malformed social links while leaving the product details available.
+            }
+        }
+    }
 }
 
 export function renderNotFound(elements) {
@@ -360,6 +379,10 @@ export function renderNotFound(elements) {
 
     if (elements && elements.description) {
         elements.description.textContent = "The requested product could not be loaded.";
+    }
+
+    if (elements && elements.socialLink) {
+        elements.socialLink.hidden = true;
     }
 }
 
