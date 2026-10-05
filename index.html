@@ -106,7 +106,7 @@
                         Price
                     </label>
 
-                    <input id="productPrice" type="number" step="0.01" min="0" inputmode="decimal" placeholder="29.99" required>
+                    <input id="productPrice" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="29.99" required>
 
                 </div>
 
@@ -117,13 +117,23 @@
                         Description
                     </label>
 
-                    <textarea id="productDescription" rows="4" placeholder="Describe your product..."></textarea>
+                    <textarea id="productDescription" rows="4" placeholder="Describe your product..." required></textarea>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="productContactLink">
+                        Contact Link
+                    </label>
+
+                    <input id="productContactLink" type="url" placeholder="https://example.com/contact" required>
 
                 </div>
 
                 <p class="form-status" id="productStatusText" aria-live="polite"></p>
 
-                <button type="submit" class="primary-btn full-width">
+                <button type="submit" class="primary-btn full-width" disabled>
                     Create Product
                 </button>
 

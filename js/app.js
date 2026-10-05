@@ -19,6 +19,7 @@ const analyticsModalContent = document.getElementById("analyticsModalContent");
 const nameInput = productForm.querySelector('input[placeholder="Wireless Mouse"]');
 const priceInput = productForm.querySelector('input[placeholder="29.99"]');
 const descriptionInput = productForm.querySelector("textarea");
+const contactLinkInput = document.getElementById("productContactLink");
 const submitButton = productForm.querySelector('button[type="submit"]');
 const statusText = document.getElementById("productStatusText");
 let lastFocusedElement = null;
@@ -151,17 +152,56 @@ searchInput.addEventListener("input", (e) => {
 const CREATE_COOLDOWN_MS = 5000; // 5 seconds cooldown after creating a product
 let lastCreateTime = 0;
 let createCooldownInterval = null;
+let isCreatingProduct = false;
+let isCreateCoolingDown = false;
+
+function isProductFormValid() {
+    const contactLink = contactLinkInput.value.trim();
+    let isContactLinkValid = false;
+
+    try {
+        const protocol = new URL(contactLink).protocol;
+        isContactLinkValid = protocol === "http:" || protocol === "https:";
+    } catch {
+        // An invalid URL keeps the submit button disabled.
+    }
+
+    return Boolean(
+        nameInput.value.trim() &&
+        descriptionInput.value.trim() &&
+        Number.isFinite(priceInput.valueAsNumber) &&
+        priceInput.valueAsNumber > 0 &&
+        contactLink &&
+        isContactLinkValid &&
+        productForm.checkValidity()
+    );
+}
+
+function updateCreateButtonState() {
+    submitButton.disabled =
+        isCreatingProduct ||
+        isCreateCoolingDown ||
+        !isProductFormValid();
+}
+
+productForm.addEventListener("input", updateCreateButtonState);
+productForm.addEventListener("reset", () => {
+    setTimeout(updateCreateButtonState, 0);
+});
+updateCreateButtonState();
 
 productForm.addEventListener("submit", async(e) => {
     e.preventDefault();
 
-    const title = nameInput.value.trim();
-    const price = parseFloat(priceInput.value);
-    const description = descriptionInput.value.trim();
-
-    if (!title || Number.isNaN(price)) {
+    if (submitButton.disabled || !isProductFormValid()) {
+        updateCreateButtonState();
         return;
     }
+
+    const title = nameInput.value.trim();
+    const price = priceInput.valueAsNumber;
+    const description = descriptionInput.value.trim();
+    const contactLink = contactLinkInput.value.trim();
 
     const now = Date.now();
     if (now - lastCreateTime < CREATE_COOLDOWN_MS) {
@@ -170,7 +210,8 @@ productForm.addEventListener("submit", async(e) => {
         return;
     }
 
-    submitButton.disabled = true;
+    isCreatingProduct = true;
+    updateCreateButtonState();
     statusText.textContent = "Adding product, please wait...";
 
     try {
@@ -178,6 +219,7 @@ productForm.addEventListener("submit", async(e) => {
             title,
             description,
             price,
+            contact_link: contactLink,
         });
 
         const newCard = createProductCard({...createdProduct, title: createdProduct.title || title, description: createdProduct.description || description, price: createdProduct.price || price, });
@@ -188,7 +230,8 @@ productForm.addEventListener("submit", async(e) => {
         // start cooldown
         lastCreateTime = Date.now();
         let remaining = Math.ceil(CREATE_COOLDOWN_MS / 1000);
-        submitButton.disabled = true;
+        isCreateCoolingDown = true;
+        updateCreateButtonState();
         statusText.textContent = `Please wait ${remaining}s before creating another product.`;
         if (createCooldownInterval) clearInterval(createCooldownInterval);
         createCooldownInterval = setInterval(() => {
@@ -198,7 +241,8 @@ productForm.addEventListener("submit", async(e) => {
             } else {
                 clearInterval(createCooldownInterval);
                 createCooldownInterval = null;
-                submitButton.disabled = false;
+                isCreateCoolingDown = false;
+                updateCreateButtonState();
                 statusText.textContent = "";
             }
         }, 1000);
@@ -208,8 +252,12 @@ productForm.addEventListener("submit", async(e) => {
     } finally {
         // only re-enable immediately if there is no active cooldown
         if (!createCooldownInterval) {
-            submitButton.disabled = false;
+            isCreatingProduct = false;
+            updateCreateButtonState();
             statusText.textContent = "";
+        } else {
+            isCreatingProduct = false;
+            updateCreateButtonState();
         }
     }
 });
