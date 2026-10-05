@@ -100,7 +100,13 @@ async function handleChatSubmit(event) {
         console.error("Failed to send chat message:", err);
         loadingContent.classList.remove("skeleton", "skeleton-chat");
         loadingContent.removeAttribute("aria-hidden");
-        loadingContent.textContent = "Unable to get a response. Please try again.";
+        if (err.status === 404) {
+            loadingContent.textContent = "No chat session was found for this product. Please refresh and try again.";
+        } else if (err.status === 409) {
+            loadingContent.textContent = "A message is already being processed. Please try again shortly.";
+        } else {
+            loadingContent.textContent = "Unable to get a response. Please try again.";
+        }
     } finally {
         isSendingMessage = false;
         if (elements.sendButton) {

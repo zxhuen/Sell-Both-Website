@@ -233,10 +233,10 @@ export async function loadChatMessages(publicId) {
         throw new Error("Public id is required");
     }
 
-    const response = await publicFetch(`${API_BASE}/Chat/Load-Chat?public_id=${encodeURIComponent(publicId)}`, {
+    const response = await authFetch(`${API_BASE}/Chat/Load-Chat?public_id=${encodeURIComponent(publicId)}`, {
         method: "GET",
         mode: "cors",
-        credentials: "include",
+        credentials: "omit",
     });
 
     const statusText = response ? response.statusText : undefined;
@@ -282,10 +282,10 @@ export async function sendLunaMessage(message, publicId) {
         throw new Error("Public id is required for chat");
     }
 
-    const response = await fetch(`${API_BASE}/Chat/Luna?public_id=${encodeURIComponent(publicId)}`, {
+    const response = await authFetch(`${API_BASE}/Chat/Luna?public_id=${encodeURIComponent(publicId)}`, {
         method: "POST",
         mode: "cors",
-        credentials: "include",
+        credentials: "omit",
         headers: {
             "Content-Type": "application/json",
         },
@@ -296,12 +296,14 @@ export async function sendLunaMessage(message, publicId) {
 
     if (!response || !response.ok) {
         const errorBody = response ? await response.json().catch(() => ({})) : {};
-        throw new Error(
+        const error = new Error(
             errorBody.detail ||
             errorBody.message ||
             statusText ||
             "Failed to send chat message"
         );
+        error.status = response ? response.status : undefined;
+        throw error;
     }
 
     const text = await response.text();
