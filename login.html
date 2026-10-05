@@ -5,175 +5,288 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/images/image.jpg">
-    <title>Sign In</title>
+    <title>Sign In | SellBot</title>
 
     <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-         :root {
-            /* Light Mode Default (Apple Style) */
-            --bg-gradient: #f5f6f8;
-            --card-bg: #ffffff;
-            --card-border: rgba(18, 28, 45, 0.09);
-            --card-shadow: 0 8px 28px rgba(18, 28, 45, 0.07);
+        :root {
+            color-scheme: light dark;
+            --page-bg: #f5f6f8;
+            --surface: #ffffff;
+            --surface-border: rgba(18, 28, 45, 0.09);
             --text-primary: #1d1d1f;
-            --text-secondary: #86868b;
-            --btn-bg: #ffffff;
-            --btn-text: #1d1d1f;
-            --btn-border: rgba(0, 0, 0, 0.08);
-            --btn-hover: #f5f5f7;
-            --btn-secondary-bg: rgba(120, 120, 128, 0.08);
-            --btn-secondary-text: #1d1d1f;
-            --btn-secondary-hover: rgba(120, 120, 128, 0.16);
-            --logo-bg: #0071e3;
-            --logo-color: #ffffff;
-            --radius-card: 16px;
-            --radius-btn: 8px;
-            --radius-full: 9999px;
-            --blur: none;
-            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            --text-secondary: #686a73;
+            --text-muted: #858791;
+            --accent: #145fcc;
+            --accent-hover: #0d51b5;
+            --focus-ring: rgba(20, 95, 204, 0.28);
+            --shadow-card: 0 20px 60px rgba(24, 37, 58, 0.08), 0 2px 8px rgba(24, 37, 58, 0.03);
+            --radius-card: 20px;
+            --transition: 180ms ease;
         }
-        /* Dark Mode Support */
-        
+
         @media (prefers-color-scheme: dark) {
-             :root {
-                --bg-gradient: #111318;
-                --card-bg: #1c2028;
-                --card-border: rgba(255, 255, 255, 0.1);
-                --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+            :root {
+                --page-bg: #111318;
+                --surface: #1c2028;
+                --surface-border: rgba(255, 255, 255, 0.1);
                 --text-primary: #f5f5f7;
-                --text-secondary: #86868b;
-                --btn-bg: #2c2c2e;
-                --btn-text: #f5f5f7;
-                --btn-border: rgba(255, 255, 255, 0.1);
-                --btn-hover: #3a3a3c;
-                --btn-secondary-bg: rgba(120, 120, 128, 0.24);
-                --btn-secondary-text: #f5f5f7;
-                --btn-secondary-hover: rgba(120, 120, 128, 0.36);
-                --logo-bg: #2997ff;
+                --text-secondary: #b0b2ba;
+                --text-muted: #92959f;
+                --accent: #6ca8ff;
+                --accent-hover: #8dbaff;
+                --focus-ring: rgba(108, 168, 255, 0.35);
+                --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.25);
             }
         }
-        
+
         * {
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
             margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 0 max(1.5rem, env(safe-area-inset-right)) 0 max(1.5rem, env(safe-area-inset-left));
+            background:
+                radial-gradient(ellipse at 50% 43%, rgba(20, 95, 204, 0.055), transparent 46%),
+                var(--page-bg);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        
-        body {
-            background: var(--bg-gradient);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding: max(1.25rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-        }
-        
-        .card {
-            background-color: var(--card-bg);
-            backdrop-filter: var(--blur);
-            -webkit-backdrop-filter: var(--blur);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-card);
-            padding: clamp(1.75rem, 7vw, 2.5rem);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-        }
-        
-        .logo {
-            width: 52px;
-            height: 52px;
-            background: var(--logo-bg);
-            border-radius: 14px;
-            margin: 0 auto 1.5rem;
+
+        .site-header {
+            width: min(100%, 1160px);
+            height: 84px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--logo-color);
-            letter-spacing: -0.02em;
-            box-shadow: 0 8px 16px rgba(0, 113, 227, 0.25);
+            justify-content: space-between;
         }
-        
-        h1 {
-            font-size: 1.625rem;
-            font-weight: 600;
-            letter-spacing: -0.022em;
-            margin-bottom: 0.35rem;
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
             color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1.125rem;
+            font-weight: 650;
+            letter-spacing: -0.04em;
         }
-        
-        p.subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9375rem;
-            line-height: 1.4;
-            letter-spacing: -0.01em;
-            margin-bottom: 2.25rem;
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #ffffff;
         }
-        
-        .google-btn {
-            width: 100%;
+
+        .brand-mark svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .nav-sign-in {
+            min-height: 40px;
+            padding: 0.6rem 1rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.625rem;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: 1px solid var(--btn-border);
-            padding: 0.875rem 1rem;
-            min-height: 3rem;
-            border-radius: var(--radius-btn);
-            font-size: 0.9375rem;
-            font-weight: 500;
-            letter-spacing: -0.01em;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-        }
-        
-        .google-btn:hover {
-            background-color: var(--btn-hover);
-            transform: translateY(-1px);
-        }
-        
-        .google-btn:active {
-            transform: translateY(0) scale(0.98);
-            opacity: 0.9;
-        }
-        
-        .google-icon {
-            width: 18px;
-            height: 18px;
-            flex: 0 0 18px;
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            background: var(--surface);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 550;
+            transition: background-color var(--transition), border-color var(--transition), transform var(--transition);
         }
 
-        .google-btn:focus-visible,
-        .btn-secondary:focus-visible {
-            outline: 3px solid rgba(0, 102, 204, 0.35);
+        .nav-sign-in:hover {
+            border-color: rgba(20, 95, 204, 0.28);
+            transform: translateY(-1px);
+        }
+
+        .nav-sign-in:focus-visible,
+        .google-btn:focus-visible {
+            outline: 3px solid var(--focus-ring);
             outline-offset: 3px;
+        }
+
+        main {
+            width: min(100%, 1040px);
+            min-height: calc(100vh - 84px);
+            min-height: calc(100dvh - 84px);
+            margin: 0 auto;
+            padding: 3rem 0 5rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+            align-items: center;
+            gap: clamp(3rem, 8vw, 7rem);
+        }
+
+        .hero-copy {
+            max-width: 540px;
+        }
+
+        .eyebrow {
+            margin: 0 0 1.25rem;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 650;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            max-width: 10ch;
+            margin: 0;
+            color: var(--text-primary);
+            font-size: clamp(3rem, 6vw, 4.6rem);
+            font-weight: 650;
+            letter-spacing: -0.075em;
+            line-height: 1.02;
+        }
+
+        .hero-description {
+            max-width: 440px;
+            margin: 1.5rem 0 2rem;
+            color: var(--text-secondary);
+            font-size: clamp(1rem, 1.6vw, 1.125rem);
+            line-height: 1.65;
+            letter-spacing: -0.015em;
+        }
+
+        .benefits {
+            display: grid;
+            gap: 0.9rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .benefits li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.45;
+        }
+
+        .benefit-check {
+            width: 21px;
+            height: 21px;
+            flex: 0 0 21px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(20, 95, 204, 0.09);
+            color: var(--accent);
+        }
+
+        .benefit-check svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .login-card {
+            width: 100%;
+            padding: clamp(1.75rem, 4vw, 2.5rem);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-card);
+            background: var(--surface);
+            box-shadow: var(--shadow-card);
+            text-align: left;
+        }
+
+        .login-card h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 620;
+            letter-spacing: -0.045em;
+            line-height: 1.25;
+        }
+
+        .card-description {
+            margin: 0.65rem 0 1.75rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.55;
+        }
+
+        .google-btn {
+            width: 100%;
+            min-height: 54px;
+            padding: 0.875rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            border: 1px solid rgba(18, 28, 45, 0.14);
+            border-radius: 12px;
+            background: #ffffff;
+            color: #202124;
+            box-shadow: 0 2px 5px rgba(24, 37, 58, 0.06);
+            font: inherit;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+        }
+
+        .google-btn:hover:not(:disabled) {
+            border-color: rgba(18, 28, 45, 0.24);
+            background: #f9fafb;
+            box-shadow: 0 5px 14px rgba(24, 37, 58, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .google-btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .google-btn:disabled {
             cursor: wait;
             opacity: 0.65;
-            transform: none;
+        }
+
+        .google-icon {
+            width: 19px;
+            height: 19px;
+            flex: 0 0 19px;
+        }
+
+        .secure-note {
+            margin: 1rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            text-align: center;
         }
 
         .login-status {
-            margin-top: 1rem;
+            margin: 1rem 0 0;
             color: var(--text-secondary);
             font-size: 0.875rem;
             line-height: 1.5;
             overflow-wrap: anywhere;
+            text-align: center;
         }
 
         .login-status[role="alert"] {
@@ -184,101 +297,162 @@
             .login-status[role="alert"] {
                 color: #ff8c82;
             }
+
+            .google-btn {
+                border-color: rgba(255, 255, 255, 0.18);
+            }
+
+            .google-btn:hover:not(:disabled) {
+                border-color: rgba(255, 255, 255, 0.32);
+                background: #f4f4f4;
+            }
         }
-        
-        .user-profile {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.25rem;
+
+        @media (max-width: 760px) {
+            body {
+                padding-right: max(1.25rem, env(safe-area-inset-right));
+                padding-left: max(1.25rem, env(safe-area-inset-left));
+            }
+
+            .site-header {
+                height: 72px;
+            }
+
+            main {
+                min-height: calc(100vh - 72px);
+                min-height: calc(100dvh - 72px);
+                max-width: 520px;
+                padding: 2.5rem 0 4rem;
+                grid-template-columns: 1fr;
+                align-content: center;
+                gap: 2.5rem;
+            }
+
+            .hero-copy {
+                max-width: none;
+            }
+
+            h1 {
+                max-width: 12ch;
+                font-size: clamp(2.75rem, 10vw, 4rem);
+            }
+
+            .hero-description {
+                max-width: 500px;
+                margin: 1.1rem 0 1.5rem;
+            }
+
+            .benefits {
+                gap: 0.7rem;
+            }
         }
-        
-        .avatar {
-            width: 72px;
-            height: 72px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .btn-secondary {
-            background: var(--btn-secondary-bg);
-            color: var(--btn-secondary-text);
-            border: none;
-            padding: 0.625rem 1.25rem;
-            min-height: 2.75rem;
-            border-radius: var(--radius-full);
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            letter-spacing: -0.01em;
-            margin-top: 0.5rem;
-            transition: var(--transition);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--btn-secondary-hover);
-        }
-        
-        .btn-secondary:active {
-            transform: scale(0.96);
+
+        @media (max-width: 420px) {
+            body {
+                padding-right: max(1rem, env(safe-area-inset-right));
+                padding-left: max(1rem, env(safe-area-inset-left));
+            }
+
+            .site-header {
+                height: 64px;
+            }
+
+            main {
+                min-height: calc(100vh - 64px);
+                min-height: calc(100dvh - 64px);
+                padding: 2rem 0 3rem;
+                gap: 2rem;
+            }
+
+            h1 {
+                font-size: clamp(2.55rem, 11vw, 3.2rem);
+            }
+
+            .login-card {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
             *::after {
+                scroll-behavior: auto !important;
                 transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <div class="card">
-
-        <div class="logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-            </svg>
-        </div>
-
-        <div id="login-view">
-
-            <h1>Welcome back</h1>
-
-            <p class="subtitle">
-                Sign in to your account to continue
-            </p>
-
-            <button id="btn-google" class="google-btn">
-
-                <svg class="google-icon" viewBox="0 0 24 24">
-                    <path fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                    <path fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+    <header class="site-header">
+        <a class="brand" href="login.html" aria-label="SellBot home">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2 2 7l10 5 10-5-10-5ZM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
+            </span>
+            <span>SellBot</span>
+        </a>
+        <a class="nav-sign-in" href="#signin">Sign In</a>
+    </header>
 
-                Sign in with Google
+    <main>
+        <section class="hero-copy" aria-labelledby="hero-title">
+            <p class="eyebrow">Your AI selling assistant</p>
+            <h1 id="hero-title">Sell smarter with AI.</h1>
+            <p class="hero-description">
+                Let SellBot answer your customers' questions 24/7 while you focus on selling.
+            </p>
+            <ul class="benefits">
+                <li>
+                    <span class="benefit-check" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="m3.5 8.2 2.8 2.7 6.2-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    AI-powered customer conversations
+                </li>
+                <li>
+                    <span class="benefit-check" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="m3.5 8.2 2.8 2.7 6.2-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    Helpful answers, available 24/7
+                </li>
+                <li>
+                    <span class="benefit-check" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="m3.5 8.2 2.8 2.7 6.2-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    Share your products with a simple link
+                </li>
+            </ul>
+        </section>
 
-            </button>
+        <section class="login-card" id="signin" aria-labelledby="signin-title">
+            <div id="login-view">
+                <h2 id="signin-title">Welcome to SellBot</h2>
+                <p class="card-description">One secure sign-in, then let your AI assistant get to work.</p>
 
-            <p class="login-status" id="loginStatus" role="status" aria-live="polite" hidden></p>
+                <button id="btn-google" class="google-btn" type="button">
+                    <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    Continue with Google
+                </button>
 
-        </div>
-
-    </div>
+                <p class="secure-note">Sign in securely with your Google account.</p>
+                <p class="login-status" id="loginStatus" role="status" aria-live="polite" hidden></p>
+            </div>
+        </section>
+    </main>
 
     <script src="js/auth.js"></script>
-
 </body>
 
 </html>
