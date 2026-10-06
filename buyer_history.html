@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/image.jpg">
+    <title>Buyer Chat History</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/buyer_history.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="buyer-history-page">
+    <p class="compatibility-notice" role="note">
+        Sellbot is still on development and still unstable so many stuff may occur.
+    </p>
+
+    <nav class="nav-bar" aria-label="Main navigation">
+        <div class="nav-brand">SellBot</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Products</a>
+            <a href="buyer_history.html" class="nav-link active" aria-current="page">Chat History</a>
+            <a href="profile.html" class="nav-link">Profile</a>
+        </div>
+    </nav>
+
+    <header class="header">
+        <div>
+            <h1>Chat History</h1>
+            <p>Your conversations about products.</p>
+        </div>
+    </header>
+
+    <main>
+        <section aria-labelledby="chatHistoryHeading">
+            <h2 class="visually-hidden" id="chatHistoryHeading">Your chat sessions</h2>
+            <div class="chat-session-list" id="chatSessionList" aria-busy="true"></div>
+            <p class="chat-history-status" id="chatHistoryStatus" role="status" aria-live="polite">
+                Loading chat history…
+            </p>
+        </section>
+    </main>
+
+    <script type="module" src="js/buyerHistory.js"></script>
+</body>
+
+</html>

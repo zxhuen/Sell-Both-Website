@@ -182,10 +182,9 @@ export async function getProductByPublicId(publicId) {
         throw new Error("Public id is required");
     }
 
-    const response = await fetch(`${API_BASE}/Products/get-product-public-id?public_id=${encodeURIComponent(publicId)}`, {
+    const response = await publicFetch(`${API_BASE}/Products/get-product-public-id?public_id=${encodeURIComponent(publicId)}`, {
         method: "GET",
         mode: "cors",
-        credentials: "omit",
     });
 
     const statusText = response ? response.statusText : undefined;
@@ -226,6 +225,33 @@ export async function getChatSessionCount(productId) {
     }
 
     return response.json();
+}
+
+export async function getBuyerChatSessions() {
+    const response = await authFetch(`${API_BASE}/Buyer/List-Chat-Sessions`, {
+        method: "GET",
+        mode: "cors",
+    });
+
+    if (!response) return null;
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(
+            errorBody?.detail ||
+            errorBody?.message ||
+            response.statusText ||
+            "Failed to load chat sessions"
+        );
+    }
+
+    const chatSessions = await response.json();
+
+    if (!Array.isArray(chatSessions)) {
+        throw new Error("The chat-session response was not a list");
+    }
+
+    return chatSessions;
 }
 
 export async function loadChatMessages(publicId) {
