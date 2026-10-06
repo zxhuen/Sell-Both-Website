@@ -125,7 +125,7 @@ async function authenticateWithBackend(session) {
 
 
         window.location.href =
-            "index.html";
+            "buyer_history.html";
 
     } catch (error) {
 
