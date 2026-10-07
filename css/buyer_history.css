@@ -50,6 +50,39 @@
     letter-spacing: -0.015em;
 }
 
+.chat-session-details {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.chat-session-owner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.chat-session-owner-avatar {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-session-owner-label {
+    font-weight: 500;
+}
+
+.chat-session-owner-name {
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+}
+
 .chat-session-timestamp {
     color: var(--text-secondary);
     font-size: 0.875rem;
@@ -92,6 +125,10 @@
         align-items: flex-start;
         flex-direction: column;
         gap: 0.5rem;
+    }
+
+    .chat-session-details {
+        width: 100%;
     }
 
     .chat-session-timestamp {
