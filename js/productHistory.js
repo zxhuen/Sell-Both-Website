@@ -96,10 +96,19 @@ function createConversationCard(session) {
         }
     }, { once: true });
 
+    const userInfo = document.createElement("div");
+    userInfo.className = "conversation-user-info";
+
     const name = document.createElement("h2");
     name.className = "conversation-user-name";
     name.textContent = displayName;
-    userDetails.append(avatar, name);
+
+    const sessionId = document.createElement("p");
+    sessionId.className = "conversation-session-id";
+    sessionId.textContent = `Chat Session ID: ${chatSessionId}`;
+
+    userInfo.append(name, sessionId);
+    userDetails.append(avatar, userInfo);
 
     const productDetails = document.createElement("div");
     productDetails.className = "conversation-product";

@@ -12,10 +12,11 @@ function setStatus(message, state = "") {
 }
 
 function createMessage(message) {
-    const isBuyer = message?.role === "user";
-    const isLuna = message?.role === "assistant";
+    const role = typeof message?.role === "string" ? message.role.toLowerCase() : "";
+    const isBuyer = role === "user";
+    const isAssistant = role === "assistant";
     const row = document.createElement("article");
-    row.className = `conversation-message-row ${isBuyer ? "is-buyer" : "is-luna"}`;
+    row.className = `conversation-message-row${isBuyer ? " is-buyer" : isAssistant ? " is-luna" : ""}`;
 
     const bubble = document.createElement("div");
     bubble.className = "conversation-message-bubble";
@@ -27,7 +28,7 @@ function createMessage(message) {
 
     const sender = document.createElement("p");
     sender.className = "conversation-message-sender";
-    sender.textContent = isBuyer ? "Buyer" : isLuna ? "Luna" : "Conversation";
+    sender.textContent = isBuyer ? "Buyer" : isAssistant ? "Lumina" : "Conversation";
 
     bubble.append(content, sender);
     row.append(bubble);

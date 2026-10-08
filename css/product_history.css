@@ -92,6 +92,18 @@
     overflow-wrap: anywhere;
 }
 
+.conversation-user-info {
+    min-width: 0;
+}
+
+.conversation-session-id {
+    margin: 0.25rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
 .conversation-product,
 .conversation-activity {
     min-width: 0;
