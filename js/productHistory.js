@@ -79,6 +79,8 @@ function createConversationCard(session) {
 
     const card = document.createElement("article");
     card.className = "product-conversation-card";
+    const chatSessionId = typeof session?.id === "string" ?
+        session.id.trim() : "";
 
     const userDetails = document.createElement("div");
     userDetails.className = "conversation-user";
@@ -126,7 +128,17 @@ function createConversationCard(session) {
     activity.append(activityLabel, activityTime);
 
     card.append(userDetails, productDetails, activity);
-    return card;
+
+    if (!uuidPattern.test(chatSessionId)) {
+        return card;
+    }
+
+    const conversationLink = document.createElement("a");
+    conversationLink.className = "product-conversation-link";
+    conversationLink.href = `conversation_history.html?chat_session_id=${encodeURIComponent(chatSessionId)}`;
+    conversationLink.setAttribute("aria-label", `View conversation with ${displayName} about ${productTitle}`);
+    conversationLink.append(card);
+    return conversationLink;
 }
 
 async function loadProductConversations() {

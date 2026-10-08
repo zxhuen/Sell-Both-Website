@@ -285,6 +285,39 @@ export async function getProductConversationHistory(productId) {
     return conversations;
 }
 
+export async function getProductChatMessages(chatSessionId) {
+    if (!chatSessionId) {
+        throw new Error("Chat session id is required");
+    }
+
+    const response = await authFetch(`${API_BASE}/Products/get-chat-messages?chat_session_id=${encodeURIComponent(chatSessionId)}`, {
+        method: "GET",
+        mode: "cors",
+    });
+
+    if (!response) return null;
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        const error = new Error(
+            errorBody?.detail ||
+            errorBody?.message ||
+            response.statusText ||
+            "Failed to load conversation history"
+        );
+        error.status = response.status;
+        throw error;
+    }
+
+    const messages = await response.json();
+
+    if (!Array.isArray(messages)) {
+        throw new Error("The conversation response was not a list");
+    }
+
+    return messages;
+}
+
 export async function loadChatMessages(publicId) {
     if (!publicId) {
         throw new Error("Public id is required");

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/image.jpg">
+    <title>Conversation History</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/product_history.css">
+    <link rel="stylesheet" href="css/conversation_history.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="conversation-history-page">
+    <p class="compatibility-notice" role="note">
+        Sellbot is still on development and still unstable so many stuff may occur.
+    </p>
+
+    <nav class="nav-bar" aria-label="Main navigation">
+        <div class="nav-brand">SellBot</div>
+        <div class="nav-links">
+            <a href="buyer_history.html" class="nav-link">Chat History</a>
+            <a href="index.html" class="nav-link active" aria-current="page">Products</a>
+            <a href="profile.html" class="nav-link">Profile</a>
+        </div>
+    </nav>
+
+    <header class="header conversation-history-header">
+        <div>
+            <h1>Conversation History</h1>
+            <p>Viewing an existing buyer conversation. This conversation is read-only.</p>
+        </div>
+        <a class="product-history-back-link" href="product_history.html">← Back to Product History</a>
+    </header>
+
+    <main>
+        <section class="conversation-history-panel" aria-labelledby="conversationHistoryHeading">
+            <h2 class="visually-hidden" id="conversationHistoryHeading">Existing conversation messages</h2>
+            <div class="conversation-message-list" id="conversationMessageList" aria-busy="true"></div>
+            <div class="conversation-history-status" id="conversationHistoryStatus" role="status" aria-live="polite">
+                Loading conversation…
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/conversationHistory.js"></script>
+</body>
+
+</html>
