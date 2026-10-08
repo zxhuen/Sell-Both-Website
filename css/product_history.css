@@ -1,0 +1,170 @@
+.product-history-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.65rem 1.15rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.product-history-back-link:hover {
+    border-color: var(--glass-border-hover);
+    background: var(--bg-tertiary);
+}
+
+.product-history-back-link:focus-visible {
+    outline: 3px solid rgba(20, 95, 204, 0.28);
+    outline-offset: 2px;
+}
+
+.product-conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.product-conversation-card {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1.2fr) minmax(0, 1fr) minmax(12rem, auto);
+    align-items: center;
+    gap: 1.5rem;
+    min-width: 0;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-sm);
+}
+
+.conversation-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.conversation-user-avatar {
+    width: 4rem;
+    height: 4rem;
+    flex: 0 0 auto;
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    object-fit: cover;
+}
+
+.conversation-user-name {
+    min-width: 0;
+    color: var(--text-primary);
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.conversation-product,
+.conversation-activity {
+    min-width: 0;
+}
+
+.conversation-product-title {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.conversation-product-price {
+    margin-top: 0.3rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.conversation-activity-label {
+    margin-bottom: 0.3rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.conversation-activity-time {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.product-history-status {
+    margin-top: 1rem;
+    padding: 1rem 1.15rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.product-history-status[hidden] {
+    display: none;
+}
+
+.product-history-status.is-empty,
+.product-history-status.is-error {
+    padding: 1.5rem;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+    text-align: center;
+}
+
+.product-history-status.is-empty {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.product-history-status.is-error {
+    color: var(--danger-red);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (max-width: 760px) {
+    .product-conversation-card {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .conversation-user-avatar {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .product-history-page .header {
+        align-items: stretch;
+    }
+
+    .product-history-back-link {
+        width: 100%;
+    }
+}

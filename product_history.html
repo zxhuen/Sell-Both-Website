@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/image.jpg">
+    <title>Product Conversations</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/product_history.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="product-history-page">
+    <p class="compatibility-notice" role="note">
+        Sellbot is still on development and still unstable so many stuff may occur.
+    </p>
+
+    <nav class="nav-bar" aria-label="Main navigation">
+        <div class="nav-brand">SellBot</div>
+        <div class="nav-links">
+            <a href="buyer_history.html" class="nav-link">Chat History</a>
+            <a href="index.html" class="nav-link active" aria-current="page">Products</a>
+            <a href="profile.html" class="nav-link">Profile</a>
+        </div>
+    </nav>
+
+    <header class="header">
+        <div>
+            <h1>Product Conversations</h1>
+            <p>See who has interacted with your product.</p>
+        </div>
+        <a class="product-history-back-link" href="index.html">Back to Products</a>
+    </header>
+
+    <main>
+        <section aria-labelledby="productConversationsHeading">
+            <h2 class="visually-hidden" id="productConversationsHeading">Conversations about this product</h2>
+            <div class="product-conversation-list" id="productConversationList" aria-busy="true"></div>
+            <div class="product-history-status" id="productHistoryStatus" role="status" aria-live="polite">
+                Loading conversations…
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/productHistory.js"></script>
+</body>
+
+</html>

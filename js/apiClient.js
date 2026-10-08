@@ -254,6 +254,37 @@ export async function getBuyerChatSessions() {
     return chatSessions;
 }
 
+export async function getProductConversationHistory(productId) {
+    if (!productId) {
+        throw new Error("Product id is required");
+    }
+
+    const response = await authFetch(`${API_BASE}/Products/get-product-history?product_id=${encodeURIComponent(productId)}`, {
+        method: "GET",
+        mode: "cors",
+    });
+
+    if (!response) return null;
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(
+            errorBody?.detail ||
+            errorBody?.message ||
+            response.statusText ||
+            "Failed to load product conversations"
+        );
+    }
+
+    const conversations = await response.json();
+
+    if (!Array.isArray(conversations)) {
+        throw new Error("The product-conversation response was not a list");
+    }
+
+    return conversations;
+}
+
 export async function loadChatMessages(publicId) {
     if (!publicId) {
         throw new Error("Public id is required");
@@ -442,6 +473,7 @@ export function createProductCard(product) {
             <span class="product-status-label">${statusLabel}</span>
             <div class="actions">
                 <button type="button" class="secondary-btn view-count-btn">View Count</button>
+                <button type="button" class="secondary-btn view-conversations-btn">View Conversations</button>
                 <button type="button" class="secondary-btn open-btn">Open</button>
                 <button type="button" class="danger-btn">Delete</button>
                 <button type="button" class="secondary-btn mark-as-sold-btn" ${isSold ? "disabled" : ""}>${isSold ? "Sold" : "Mark as Sold"}</button>

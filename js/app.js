@@ -275,9 +275,23 @@ loadProducts(productGrid, listStatusText);
 // ==========================================================================
 productGrid.addEventListener("click", async(e) => {
     const viewCountButton = e.target.closest(".view-count-btn");
+    const viewConversationsButton = e.target.closest(".view-conversations-btn");
     const markSoldButton = e.target.closest(".mark-as-sold-btn");
     const openButton = e.target.closest(".open-btn");
     const deleteButton = e.target.closest(".danger-btn");
+
+    if (viewConversationsButton) {
+        const card = viewConversationsButton.closest(".product-card");
+        const productId = card && card.dataset.productId;
+
+        if (!productId) {
+            alert("This product is missing its id, so its conversations cannot be viewed.");
+            return;
+        }
+
+        window.location.href = `product_history.html?product_id=${encodeURIComponent(productId)}`;
+        return;
+    }
 
     if (viewCountButton) {
         const card = viewCountButton.closest(".product-card");
