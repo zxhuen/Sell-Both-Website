@@ -1335,6 +1335,69 @@ button:disabled {
     box-shadow: none;
 }
 
+.product-page {
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.product-page .compatibility-notice {
+    flex: 0 0 auto;
+    margin-bottom: 0.75rem;
+    padding-block: 0.55rem;
+    font-size: 0.8rem;
+}
+
+.product-page > .header {
+    display: block;
+    flex: 0 0 auto;
+    min-height: 0;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.product-page .back-link {
+    margin-bottom: 0.65rem;
+}
+
+.product-page .product-hero-card {
+    padding: clamp(0.8rem, 2vh, 1.25rem);
+}
+
+.product-page .product-hero-header {
+    margin-bottom: 0.35rem;
+}
+
+.product-page .product-hero-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.product-page .product-social-link {
+    margin-top: 0.65rem;
+    padding: 0.65rem 0.8rem;
+}
+
+.product-page main {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.product-page .chat-section {
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin-top: 0;
+}
+
 .chat-header {
     padding: 1rem clamp(1rem, 3vw, 1.5rem);
 }
@@ -1366,6 +1429,10 @@ button:disabled {
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
+.product-page .chat-input-area {
+    flex: 0 0 auto;
+}
+
 .chat-input {
     min-width: 0;
     min-height: 2.75rem;
@@ -1376,6 +1443,35 @@ button:disabled {
 .send-btn {
     width: 2.75rem;
     height: 2.75rem;
+}
+
+@media (max-height: 560px) {
+    .product-page {
+        padding-block: 0.5rem;
+    }
+
+    .product-page .compatibility-notice {
+        margin-bottom: 0.4rem;
+        padding-block: 0.35rem;
+    }
+
+    .product-page > .header {
+        margin-bottom: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .product-page .back-link {
+        min-height: 2.25rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .product-page .product-hero-card {
+        padding: 0.6rem 0.85rem;
+    }
+
+    .product-page .product-hero-description {
+        -webkit-line-clamp: 1;
+    }
 }
 
 .profile-container {
