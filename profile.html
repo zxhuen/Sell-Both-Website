@@ -136,6 +136,14 @@
             font-weight: 400;
             letter-spacing: -0.01em;
         }
+
+        #profileReturnLink[hidden] {
+            display: none;
+        }
+
+        .profile-return-link {
+            flex: 0 0 auto;
+        }
         /* Buttons */
         
         .primary-btn {
@@ -431,15 +439,6 @@
                 flex-wrap: wrap;
                 padding: 0.85rem 1rem;
             }
-            .nav-links {
-                width: 100%;
-                gap: 0.4rem;
-            }
-            .nav-link {
-                flex: 1;
-                justify-content: center;
-                padding: 0.6rem 0.5rem;
-            }
             .header {
                 align-items: stretch;
                 flex-direction: column;
@@ -490,8 +489,15 @@
     <nav class="nav-bar" aria-label="Main navigation">
         <div class="nav-brand">SellBot</div>
         <div class="nav-links">
-            <a href="buyer_history.html" class="nav-link">Chat History</a>
-            <a href="index.html" class="nav-link">Products</a>
+            <div class="nav-group" role="group" aria-label="Seller">
+                <span class="nav-group-title">Seller</span>
+                <a href="customer-chats.html" class="nav-link">Customer Chats</a>
+                <a href="index.html" class="nav-link">Products</a>
+            </div>
+            <div class="nav-group" role="group" aria-label="Buyer">
+                <span class="nav-group-title">Buyer</span>
+                <a href="buyer_history.html" class="nav-link">Chat History</a>
+            </div>
             <a href="profile.html" class="nav-link active">Profile</a>
         </div>
     </nav>
@@ -502,6 +508,9 @@
             <h1>Account Profile</h1>
             <p>Manage your account settings and view subscription limits.</p>
         </div>
+        <a class="primary-btn profile-return-link" id="profileReturnLink" href="buyer_history.html" hidden>
+            Return to workspace
+        </a>
     </header>
 
     <!-- PROFILE CONTAINER -->
@@ -570,6 +579,25 @@
 
     <script type="module">
     import { getUserProfile } from "./js/apiClient.js";
+
+    const returnDestinations = {
+        "buyer_history.html": { label: "Back to Buyer's Space", href: "buyer_history.html" },
+        "index.html": { label: "Back to Seller's Workspace", href: "index.html" },
+        "customer-chats.html": { label: "Back to Customer Chats", href: "customer-chats.html" },
+        "product_history.html": { label: "Back to Product Conversations", href: "product_history.html" },
+        "conversation_history.html": { label: "Back to Conversation", href: "conversation_history.html" },
+    };
+
+    const returnPage = new URLSearchParams(window.location.search).get("return_to");
+    const returnDestination = returnPage && Object.hasOwn(returnDestinations, returnPage) ?
+        returnDestinations[returnPage] : null;
+    const profileReturnLink = document.getElementById("profileReturnLink");
+
+    if (returnDestination && profileReturnLink) {
+        profileReturnLink.href = returnDestination.href;
+        profileReturnLink.textContent = returnDestination.label;
+        profileReturnLink.hidden = false;
+    }
 
     async function initProfile() {
         const profileHero = document.getElementById("profileHero");

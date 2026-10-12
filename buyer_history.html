@@ -21,9 +21,16 @@
     <nav class="nav-bar" aria-label="Main navigation">
         <div class="nav-brand">SellBot</div>
         <div class="nav-links">
-            <a href="buyer_history.html" class="nav-link active" aria-current="page">Chat History</a>
-            <a href="index.html" class="nav-link">Products</a>
-            <a href="profile.html" class="nav-link">Profile</a>
+            <div class="nav-group" role="group" aria-label="Seller">
+                <span class="nav-group-title">Seller</span>
+                <a href="customer-chats.html" class="nav-link">Customer Chats</a>
+                <a href="index.html" class="nav-link">Products</a>
+            </div>
+            <div class="nav-group" role="group" aria-label="Buyer">
+                <span class="nav-group-title">Buyer</span>
+                <a href="buyer_history.html" class="nav-link active" aria-current="page">Chat History</a>
+            </div>
+            <a href="profile.html?return_to=buyer_history.html" class="nav-link">Profile</a>
         </div>
     </nav>
 
