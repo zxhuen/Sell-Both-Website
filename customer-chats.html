@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/images/image.jpg">
+    <title>Customer Chats | SellBot</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/customer_chats.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="customer-chats-page">
+    <p class="compatibility-notice" role="note">
+        Sellbot is still on development and still unstable so many stuff may occur.
+    </p>
+
+    <nav class="nav-bar" aria-label="Main navigation">
+        <div class="nav-brand">SellBot</div>
+        <div class="nav-links">
+            <a href="buyer_history.html" class="nav-link">Chat History</a>
+            <a href="customer-chats.html" class="nav-link active" aria-current="page">Customer Chats</a>
+            <a href="index.html" class="nav-link">Products</a>
+            <a href="profile.html" class="nav-link">Profile</a>
+        </div>
+    </nav>
+
+    <header class="header customer-chats-header">
+        <div>
+            <h1>Customer Chats</h1>
+            <p>Keep up with customers and the products they’re interested in.</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="customer-chats-panel" aria-labelledby="customerChatsHeading">
+            <div class="customer-chats-panel-heading">
+                <div>
+                    <h2 id="customerChatsHeading">Conversations</h2>
+                    <p>Recent activity appears first.</p>
+                </div>
+                <span class="customer-chats-count" id="customerChatsCount" aria-live="polite"></span>
+            </div>
+            <div class="customer-chat-list" id="customerChatList" aria-busy="true"></div>
+            <p class="customer-chats-status" id="customerChatsStatus" role="status" aria-live="polite">
+                Loading customer conversations…
+            </p>
+            <div class="customer-chats-pagination">
+                <button class="primary-btn customer-chats-load-more" id="loadMoreChats" type="button" hidden>
+                    Load more conversations
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/customerChats.js"></script>
+</body>
+
+</html>

@@ -254,6 +254,46 @@ export async function getBuyerChatSessions() {
     return chatSessions;
 }
 
+export async function getCustomerChats(offset = 0, limit = 10) {
+    if (!Number.isInteger(offset) || offset < 0) {
+        throw new Error("Chat offset must be a non-negative integer");
+    }
+
+    if (!Number.isInteger(limit) || limit < 1) {
+        throw new Error("Chat limit must be a positive integer");
+    }
+
+    const response = await authFetch(
+        `${API_BASE}/Products/Customer-Chats?offset=${offset}&limit=${limit}`,
+        {
+            method: "GET",
+            mode: "cors",
+        }
+    );
+
+    if (!response) return null;
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        const error = new Error(
+            errorBody?.detail ||
+            errorBody?.message ||
+            response.statusText ||
+            "Failed to load customer chats"
+        );
+        error.status = response.status;
+        throw error;
+    }
+
+    const chatSessions = await response.json();
+
+    if (!Array.isArray(chatSessions)) {
+        throw new Error("The customer-chat response was not a list");
+    }
+
+    return chatSessions;
+}
+
 export async function getProductConversationHistory(productId) {
     if (!productId) {
         throw new Error("Product id is required");
